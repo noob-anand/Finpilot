@@ -42,6 +42,35 @@ export default function AiCopilot() {
     }
   }, [messages, isLoading]);
 
+  const streamResponse = (node: QnaNode) => {
+    const words = node.answerText.split(' ');
+    const assistantMessage: Message = {
+      id: `assistant-${Date.now()}`,
+      text: '',
+      role: 'assistant',
+    };
+    
+    setMessages((prev) => [...prev, assistantMessage]);
+
+    let wordIndex = 0;
+    const interval = setInterval(() => {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantMessage.id
+            ? { ...m, text: words.slice(0, wordIndex + 1).join(' ') }
+            : m
+        )
+      );
+      wordIndex++;
+      if (wordIndex >= words.length) {
+        clearInterval(interval);
+        setCurrentQuestionIds(node.followUpQuestionIds);
+        setIsLoading(false);
+      }
+    }, 100); // Adjust typing speed here
+  };
+
+
   const handleQuestionSelect = (questionId: string) => {
     const node: QnaNode = qnaTree[questionId];
     if (!node || isLoading) return;
@@ -57,17 +86,12 @@ export default function AiCopilot() {
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
     setInputValue('');
+    setCurrentQuestionIds([]);
+
 
     setTimeout(() => {
-      const assistantMessage: Message = {
-        id: `assistant-${Date.now()}`,
-        text: node.answerText,
-        role: 'assistant',
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-      setCurrentQuestionIds(node.followUpQuestionIds);
-      setIsLoading(false);
-    }, 5000);
+      streamResponse(node);
+    }, 1000 + Math.random() * 1000); // Simulate "thinking" time
   };
 
   const handleReset = () => {
@@ -91,16 +115,16 @@ export default function AiCopilot() {
         setMessages((prev) => [...prev, userMessage]);
         setIsLoading(true);
         setInputValue('');
+        setCurrentQuestionIds([]);
 
         setTimeout(() => {
-            const assistantMessage: Message = {
-                id: `assistant-${Date.now()}`,
-                text: "I'm sorry, I can only respond to the suggested questions. Please select one of the options.",
-                role: 'assistant',
+            const fallbackNode: QnaNode = {
+                questionText: '',
+                answerText: "I'm sorry, I can only respond to the suggested questions. Please select one of the options to continue.",
+                followUpQuestionIds: rootQuestionIds,
             };
-            setMessages((prev) => [...prev, assistantMessage]);
-            setIsLoading(false);
-        }, 2000); // Shorter delay for error message
+            streamResponse(fallbackNode);
+        }, 1000);
     }
   }
 
@@ -156,7 +180,7 @@ export default function AiCopilot() {
                         : 'bg-muted'
                     )}
                   >
-                    <p style={{ whiteSpace: 'pre-wrap' }}>{message.text}</p>
+                    <p style={{ whiteSpace: 'pre-wrap' }}>{message.text}{message.role === 'assistant' && isLoading && message.id === messages[messages.length - 1]?.id ? '...' : ''}</p>
                   </div>
                   {message.role === 'user' && (
                     <Avatar className="w-8 h-8 border">
@@ -171,19 +195,6 @@ export default function AiCopilot() {
                   )}
                 </div>
               ))}
-               {isLoading && (
-                <div className="flex items-start gap-3">
-                  <Avatar className="w-8 h-8 border">
-                    <div className="w-8 h-8 flex items-center justify-center bg-primary rounded-full">
-                      <Bot className="h-5 w-5 text-primary-foreground" />
-                    </div>
-                  </Avatar>
-                  <div className="rounded-lg px-4 py-3 max-w-[80%] text-sm bg-muted flex items-center">
-                    <Loader className="h-4 w-4 animate-spin mr-2" />
-                    Typing...
-                  </div>
-                </div>
-              )}
             </div>
           </ScrollArea>
           <SheetFooter className="mt-auto flex flex-col gap-4">
@@ -200,7 +211,7 @@ export default function AiCopilot() {
                   {qnaTree[id].questionText}
                 </Button>
               ))}
-              {messages.length > 0 && (
+              {messages.length > 0 && currentQuestionIds.length > 0 && !isLoading && (
                 <Button
                   variant="ghost"
                   size="sm"
