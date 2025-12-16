@@ -58,6 +58,10 @@ export function DashboardChart() {
           <ResponsiveContainer width="100%" height={300}>
             <ComposedChart data={data}>
               <defs>
+                <linearGradient id="splitColorArea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(142.1 76.2% 36.3%)" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="hsl(0 84.2% 60.2%)" stopOpacity={0.8}/>
+                </linearGradient>
                 <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="50%" stopColor="hsl(142.1 76.2% 36.3%)" stopOpacity={1}/>
                   <stop offset="50%" stopColor="hsl(0 84.2% 60.2%)" stopOpacity={1}/>
@@ -71,38 +75,37 @@ export function DashboardChart() {
                 axisLine={false}
               />
               <YAxis
+                yAxisId="left"
                 stroke="#888888"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(value) => `$${value / 1000}k`}
               />
+               <YAxis yAxisId="right" orientation="right" hide={true} />
               <ChartTooltip
                 cursor={{ fill: 'hsl(var(--muted))' }}
                 content={<ChartTooltipContent />}
               />
               <ChartLegend content={<ChartLegendContent />} />
+              <Area 
+                yAxisId="right" 
+                type="monotone" 
+                dataKey="netProfit" 
+                fill="url(#splitColorArea)" 
+                stroke="transparent" 
+              />
               <Bar
+                yAxisId="left"
                 dataKey="inflow"
                 fill="var(--color-inflow)"
                 radius={[4, 4, 0, 0]}
               />
               <Bar
+                yAxisId="left"
                 dataKey="outflow"
                 fill="var(--color-outflow)"
                 radius={[4, 4, 0, 0]}
-              />
-              <Line
-                type="monotone"
-                dataKey="netProfit"
-                stroke="url(#splitColor)"
-                strokeWidth={2}
-                dot={{
-                  fill: 'var(--color-netProfit)',
-                }}
-                activeDot={{
-                  r: 6,
-                }}
               />
             </ComposedChart>
           </ResponsiveContainer>
