@@ -1,6 +1,15 @@
 'use client';
 
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
+import {
+  Bar,
+  ComposedChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Line,
+  Legend,
+} from 'recharts';
 import {
   Card,
   CardContent,
@@ -9,7 +18,14 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { getMonthlyChartData } from '@/lib/data';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+  ChartLegend,
+  ChartLegendContent,
+} from '@/components/ui/chart';
 
 const chartConfig = {
   inflow: {
@@ -19,6 +35,10 @@ const chartConfig = {
   outflow: {
     label: 'Outflow',
     color: 'hsl(var(--chart-2))',
+  },
+  netProfit: {
+    label: 'Net Profit',
+    color: 'hsl(var(--chart-3))',
   },
 } satisfies ChartConfig;
 
@@ -34,7 +54,7 @@ export function DashboardChart() {
       <CardContent>
         <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={data}>
+            <ComposedChart data={data}>
               <XAxis
                 dataKey="month"
                 stroke="#888888"
@@ -53,9 +73,30 @@ export function DashboardChart() {
                 cursor={{ fill: 'hsl(var(--muted))' }}
                 content={<ChartTooltipContent />}
               />
-              <Bar dataKey="inflow" fill="var(--color-inflow)" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="outflow" fill="var(--color-outflow)" radius={[4, 4, 0, 0]} />
-            </BarChart>
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar
+                dataKey="inflow"
+                fill="var(--color-inflow)"
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="outflow"
+                fill="var(--color-outflow)"
+                radius={[4, 4, 0, 0]}
+              />
+              <Line
+                type="monotone"
+                dataKey="netProfit"
+                stroke="var(--color-netProfit)"
+                strokeWidth={2}
+                dot={{
+                  fill: 'var(--color-netProfit)',
+                }}
+                activeDot={{
+                  r: 6,
+                }}
+              />
+            </ComposedChart>
           </ResponsiveContainer>
         </ChartContainer>
       </CardContent>

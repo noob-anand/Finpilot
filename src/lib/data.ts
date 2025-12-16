@@ -57,7 +57,8 @@ export const getMonthlyChartData = () => {
     const monthName = format(month, 'MMM');
     const inflow = Math.floor(Math.random() * (10000 - 4000 + 1)) + 4000;
     const outflow = Math.floor(Math.random() * (8000 - 3000 + 1)) + 3000;
-    data.push({ month: monthName, inflow, outflow });
+    const netProfit = inflow - outflow;
+    data.push({ month: monthName, inflow, outflow, netProfit });
   }
   return data;
 };
