@@ -17,17 +17,25 @@ import {
 } from '@/components/ui/chart';
 
 const chartConfig = {
-  'Operating Expenses': {
-    label: 'Expenses',
+  'Rent': {
+    label: 'Rent',
+    color: 'hsl(var(--chart-1))',
+  },
+  'Salaries': {
+    label: 'Salaries',
     color: 'hsl(var(--chart-2))',
   },
   'Taxes': {
     label: 'Taxes',
+    color: 'hsl(var(--chart-3))',
+  },
+  'Marketing': {
+    label: 'Marketing',
     color: 'hsl(var(--chart-4))',
   },
   'Investments': {
     label: 'Investments',
-    color: 'hsl(var(--chart-1))',
+    color: 'hsl(var(--chart-5))',
   },
 } satisfies ChartConfig;
 

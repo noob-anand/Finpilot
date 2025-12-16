@@ -92,23 +92,19 @@ export const getCapitalAllocation = (): AssetAllocation[] => {
     const financialSummary = getFinancialSummary();
     const portfolioSummary = getPortfolioSummary();
 
-    const operatingExpenses = financialSummary.cashOutflow;
+    // Mock data for a more detailed breakdown
+    const rent = 1200;
+    const salaries = 2500; // Mocked salary data
+    const marketing = transactions.find(t => t.description === 'Marketing Campaign')?.amount || 0;
+    
     const taxes = financialSummary.netTaxes;
     const investments = portfolioSummary.totalInvested;
 
-    const totalAllocation = operatingExpenses + taxes + investments;
-
-    if (totalAllocation === 0) {
-        return [
-            { name: 'Operating Expenses', value: 1 },
-            { name: 'Taxes', value: 1 },
-            { name: 'Investments', value: 1 },
-        ];
-    }
-    
     return [
-        { name: 'Operating Expenses', value: operatingExpenses },
+        { name: 'Rent', value: rent },
+        { name: 'Salaries', value: salaries },
         { name: 'Taxes', value: taxes },
+        { name: 'Marketing', value: marketing },
         { name: 'Investments', value: investments }
     ];
 };
