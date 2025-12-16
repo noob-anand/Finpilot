@@ -9,7 +9,18 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { getMonthlyChartData } from '@/lib/data';
-import { ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
+
+const chartConfig = {
+  inflow: {
+    label: 'Inflow',
+    color: 'hsl(var(--chart-1))',
+  },
+  outflow: {
+    label: 'Outflow',
+    color: 'hsl(var(--chart-2))',
+  },
+} satisfies ChartConfig;
 
 export function DashboardChart() {
   const data = getMonthlyChartData();
@@ -21,30 +32,32 @@ export function DashboardChart() {
         <CardDescription>Monthly Inflow vs. Outflow</CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data}>
-             <XAxis
-              dataKey="month"
-              stroke="#888888"
-              fontSize={12}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              stroke="#888888"
-              fontSize={12}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(value) => `$${value / 1000}k`}
-            />
-            <Tooltip
-              cursor={{ fill: 'hsl(var(--muted))' }}
-              content={<ChartTooltipContent />}
-            />
-            <Bar dataKey="inflow" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="outflow" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={data}>
+              <XAxis
+                dataKey="month"
+                stroke="#888888"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                stroke="#888888"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => `$${value / 1000}k`}
+              />
+              <ChartTooltip
+                cursor={{ fill: 'hsl(var(--muted))' }}
+                content={<ChartTooltipContent />}
+              />
+              <Bar dataKey="inflow" fill="var(--color-inflow)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="outflow" fill="var(--color-outflow)" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
       </CardContent>
     </Card>
   );
