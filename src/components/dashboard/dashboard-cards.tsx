@@ -46,11 +46,11 @@ export function DashboardCards() {
       icon: CircleDollarSign,
       color:
         summary.netCashFlow >= 0
-          ? 'text-[#2e22ff]'
+          ? 'text-[#24ccff]'
           : 'text-orange-600 dark:text-orange-400',
       bgColor:
         summary.netCashFlow >= 0
-          ? 'bg-[#eaf0ff] dark:bg-blue-900/50'
+          ? 'bg-cyan-100 dark:bg-cyan-900/50'
           : 'bg-orange-100 dark:bg-orange-900/50',
     },
     {
@@ -70,7 +70,7 @@ export function DashboardCards() {
             <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
             <card.icon className={cn('h-5 w-5', card.color)} />
           </CardHeader>
-          <CardContent className={cn('rounded-lg', card.bgColor)}>
+          <CardContent className={cn('rounded-lg p-4', card.bgColor)}>
             <div className={cn('text-2xl font-bold', card.color)}>{card.amount}</div>
           </CardContent>
         </Card>
