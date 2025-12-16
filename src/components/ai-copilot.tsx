@@ -30,7 +30,10 @@ import { summarizeFinancialData } from '@/ai/flows/ai-summarize-financial-data';
 import { getFinancialSummary } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { AiCopilotSuggestsImprovementsInput } from '@/ai/schemas';
+import {
+  AiCopilotSuggestsImprovementsInput,
+  AICopilotAnswersCashFlowQuestionsInput,
+} from '@/ai/schemas';
 
 const formSchema = z.object({
   prompt: z.string().min(1, 'Please enter a question.'),
@@ -114,6 +117,7 @@ export default function AiCopilot() {
         const response = await aiCopilotAnswersCashFlowQuestions({
           ...financialData,
           question: promptText,
+          transactionPatterns: financialData.transactionPatterns,
         });
         responseText = response.answer;
       }
