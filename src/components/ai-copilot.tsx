@@ -56,6 +56,7 @@ export default function AiCopilot() {
 
   const questionCount = messages.filter((m) => m.role === 'user').length;
   const isLimitReached = questionCount >= MAX_QUESTIONS;
+  const remainingQuestions = MAX_QUESTIONS - questionCount;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -147,9 +148,14 @@ export default function AiCopilot() {
           </SheetTrigger>
           <SheetContent className="flex flex-col w-full sm:max-w-md">
             <SheetHeader>
-              <SheetTitle className="flex items-center gap-2 text-xl">
-                <Bot className="text-primary" />
-                AI Copilot
+              <SheetTitle className="flex items-center justify-between text-xl">
+                 <div className='flex items-center gap-2'>
+                    <Bot className="text-primary" />
+                    AI Copilot
+                 </div>
+                 <div className="text-sm font-normal text-muted-foreground">
+                    {remainingQuestions} / {MAX_QUESTIONS} left
+                 </div>
               </SheetTitle>
             </SheetHeader>
             <ScrollArea className="flex-1 my-4 pr-4 -mr-6" ref={scrollAreaRef}>
