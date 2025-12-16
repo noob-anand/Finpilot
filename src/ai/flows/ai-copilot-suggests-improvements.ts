@@ -21,22 +21,29 @@ export async function aiCopilotSuggestsImprovements(
   return aiCopilotSuggestsImprovementsFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'aiCopilotSuggestsImprovementsPrompt',
-  input: {schema: AiCopilotSuggestsImprovementsInputSchema},
-  output: {schema: AiCopilotSuggestsImprovementsOutputSchema},
-  prompt: `You are a virtual financial advisor for small business owners. Based on the provided financial data, provide actionable recommendations to improve their financial performance this month.\n\nFinancial Data:\n- Cash Inflow: {{{cashInflow}}}\n- Cash Outflow: {{{cashOutflow}}}\n- Net Cash Flow: {{{netCashFlow}}}\n- Unpaid Invoices Count: {{{unpaidInvoicesCount}}}\n- Transaction Patterns: {{{transactionPatterns}}}\n\nRecommendations:`,
-});
-
 const aiCopilotSuggestsImprovementsFlow = ai.defineFlow(
   {
     name: 'aiCopilotSuggestsImprovementsFlow',
     inputSchema: AiCopilotSuggestsImprovementsInputSchema,
     outputSchema: AiCopilotSuggestsImprovementsOutputSchema,
-    model: 'googleai/gemini-1.5-flash',
   },
   async input => {
-    const {output} = await prompt(input);
+    const {output} = await ai.generate({
+      model: 'googleai/gemini-1.5-flash',
+      output: {
+        schema: AiCopilotSuggestsImprovementsOutputSchema,
+      },
+      prompt: `You are a virtual financial advisor for small business owners. Based on the provided financial data, provide actionable recommendations to improve their financial performance this month.
+
+Financial Data:
+- Cash Inflow: ${input.cashInflow}
+- Cash Outflow: ${input.cashOutflow}
+- Net Cash Flow: ${input.netCashFlow}
+- Unpaid Invoices Count: ${input.unpaidInvoicesCount}
+- Transaction Patterns: ${input.transactionPatterns}
+
+Recommendations:`,
+    });
     return output!;
   }
 );

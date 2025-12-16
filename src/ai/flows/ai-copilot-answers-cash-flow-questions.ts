@@ -22,28 +22,11 @@ export async function aiCopilotAnswersCashFlowQuestions(
   return aiCopilotAnswersCashFlowQuestionsFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'aiCopilotAnswersCashFlowQuestionsPrompt',
-  input: {
-    schema: z.object({
-      question: z.string(),
-      summary: z.string(),
-    }),
-  },
-  output: {schema: AICopilotAnswersCashFlowQuestionsOutputSchema},
-  prompt: `You are a virtual financial advisor for small business owners. Use the provided financial summary to answer the user's question about their cash flow in plain English, providing actionable explanations and recommendations.
-
-Question: {{{question}}}
-
-Financial Summary: {{{summary}}}`,
-});
-
 const aiCopilotAnswersCashFlowQuestionsFlow = ai.defineFlow(
   {
     name: 'aiCopilotAnswersCashFlowQuestionsFlow',
     inputSchema: AICopilotAnswersCashFlowQuestionsInputSchema,
     outputSchema: AICopilotAnswersCashFlowQuestionsOutputSchema,
-    model: 'googleai/gemini-1.5-flash',
   },
   async input => {
     const expenseRatio =
@@ -60,11 +43,19 @@ const aiCopilotAnswersCashFlowQuestionsFlow = ai.defineFlow(
     });
 
     const summaryText = `${financialSummary.summary}\n\n**Recommendations:**\n${financialSummary.recommendations}`;
+    
+    const {output} = await ai.generate({
+      model: 'googleai/gemini-1.5-flash',
+      output: {
+        schema: AICopilotAnswersCashFlowQuestionsOutputSchema,
+      },
+      prompt: `You are a virtual financial advisor for small business owners. Use the provided financial summary to answer the user's question about their cash flow in plain English, providing actionable explanations and recommendations.
 
-    const {output} = await prompt({
-      question: input.question,
-      summary: summaryText,
+Question: ${input.question}
+
+Financial Summary: ${summaryText}`,
     });
+
     return output!;
   }
 );
