@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Bot, Sparkles, Home, Send } from 'lucide-react';
+import { Bot, Sparkles, Home, Send, Loader } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -31,6 +31,7 @@ export default function AiCopilot() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -39,11 +40,11 @@ export default function AiCopilot() {
         behavior: 'smooth',
       });
     }
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const handleQuestionSelect = (questionId: string) => {
     const node: QnaNode = qnaTree[questionId];
-    if (!node) return;
+    if (!node || isLoading) return;
 
     setInputValue(node.questionText);
 
@@ -53,15 +54,20 @@ export default function AiCopilot() {
       role: 'user',
     };
 
-    const assistantMessage: Message = {
-      id: `assistant-${Date.now()}`,
-      text: node.answerText,
-      role: 'assistant',
-    };
-
-    setMessages((prev) => [...prev, userMessage, assistantMessage]);
-    setCurrentQuestionIds(node.followUpQuestionIds);
+    setMessages((prev) => [...prev, userMessage]);
+    setIsLoading(true);
     setInputValue('');
+
+    setTimeout(() => {
+      const assistantMessage: Message = {
+        id: `assistant-${Date.now()}`,
+        text: node.answerText,
+        role: 'assistant',
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+      setCurrentQuestionIds(node.followUpQuestionIds);
+      setIsLoading(false);
+    }, 5000);
   };
 
   const handleReset = () => {
@@ -71,25 +77,30 @@ export default function AiCopilot() {
   };
   
   const handleSend = () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isLoading) return;
 
     const matchedQuestionId = Object.keys(qnaTree).find(id => qnaTree[id].questionText.toLowerCase() === inputValue.toLowerCase().trim());
     if (matchedQuestionId) {
         handleQuestionSelect(matchedQuestionId);
     } else {
-         const userMessage: Message = {
+        const userMessage: Message = {
             id: `user-${Date.now()}`,
             text: inputValue,
             role: 'user',
         };
-
-        const assistantMessage: Message = {
-            id: `assistant-${Date.now()}`,
-            text: "I'm sorry, I can only respond to the suggested questions. Please select one of the options.",
-            role: 'assistant',
-        };
-        setMessages((prev) => [...prev, userMessage, assistantMessage]);
+        setMessages((prev) => [...prev, userMessage]);
+        setIsLoading(true);
         setInputValue('');
+
+        setTimeout(() => {
+            const assistantMessage: Message = {
+                id: `assistant-${Date.now()}`,
+                text: "I'm sorry, I can only respond to the suggested questions. Please select one of the options.",
+                role: 'assistant',
+            };
+            setMessages((prev) => [...prev, assistantMessage]);
+            setIsLoading(false);
+        }, 2000); // Shorter delay for error message
     }
   }
 
@@ -160,6 +171,19 @@ export default function AiCopilot() {
                   )}
                 </div>
               ))}
+               {isLoading && (
+                <div className="flex items-start gap-3">
+                  <Avatar className="w-8 h-8 border">
+                    <div className="w-8 h-8 flex items-center justify-center bg-primary rounded-full">
+                      <Bot className="h-5 w-5 text-primary-foreground" />
+                    </div>
+                  </Avatar>
+                  <div className="rounded-lg px-4 py-3 max-w-[80%] text-sm bg-muted flex items-center">
+                    <Loader className="h-4 w-4 animate-spin mr-2" />
+                    Typing...
+                  </div>
+                </div>
+              )}
             </div>
           </ScrollArea>
           <SheetFooter className="mt-auto flex flex-col gap-4">
@@ -171,6 +195,7 @@ export default function AiCopilot() {
                   size="sm"
                   className="text-xs h-auto py-1.5"
                   onClick={() => handleQuestionSelect(id)}
+                  disabled={isLoading}
                 >
                   {qnaTree[id].questionText}
                 </Button>
@@ -181,6 +206,7 @@ export default function AiCopilot() {
                   size="sm"
                   className="text-xs h-auto py-1.5"
                   onClick={handleReset}
+                  disabled={isLoading}
                 >
                   <Home className="mr-1 h-3 w-3" />
                   Back to Start
@@ -200,8 +226,9 @@ export default function AiCopilot() {
                             handleSend();
                         }
                     }}
+                    disabled={isLoading}
                 />
-                 <Button onClick={handleSend} size="icon" className="shrink-0">
+                 <Button onClick={handleSend} size="icon" className="shrink-0" disabled={isLoading}>
                     <Send className="h-4 w-4" />
                 </Button>
             </div>
