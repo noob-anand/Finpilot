@@ -15,8 +15,6 @@ import {
   type FinancialDataSummaryOutput,
 } from '@/ai/schemas';
 
-export {type FinancialDataSummaryInput, type FinancialDataSummaryOutput};
-
 export async function summarizeFinancialData(
   input: FinancialDataSummaryInput
 ): Promise<FinancialDataSummaryOutput> {

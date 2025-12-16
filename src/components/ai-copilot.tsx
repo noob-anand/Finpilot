@@ -27,7 +27,7 @@ import {
 import { aiCopilotAnswersCashFlowQuestions } from '@/ai/flows/ai-copilot-answers-cash-flow-questions';
 import { aiCopilotSuggestsImprovements } from '@/ai/flows/ai-copilot-suggests-improvements';
 import { summarizeFinancialData } from '@/ai/flows/ai-summarize-financial-data';
-import { getFinancialSummary, getMonthlyChartData } from '@/lib/data';
+import { getFinancialSummary } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
@@ -90,21 +90,19 @@ export default function AiCopilot() {
 
     try {
       const financialData = getFinancialSummary();
-      const netCashFlow = financialData.cashInflow - financialData.cashOutflow;
+      const {cashInflow, cashOutflow, netCashFlow} = financialData;
       let responseText = '';
       
       if (promptText.toLowerCase().includes('improve')) {
         const response = await aiCopilotSuggestsImprovements({
             ...financialData,
-            netCashFlow,
         });
         responseText = response.suggestions;
       } else if (promptText.toLowerCase().includes('summarize')) {
         const delayedReceivablesRatio = 0.2; 
-        const expenseRatio = financialData.cashOutflow / (financialData.cashInflow || 1);
+        const expenseRatio = cashInflow > 0 ? cashOutflow / cashInflow : 0;
         const response = await summarizeFinancialData({
             ...financialData,
-            netCashFlow,
             delayedReceivablesRatio,
             expenseRatio,
         });
@@ -112,7 +110,6 @@ export default function AiCopilot() {
       } else {
         const response = await aiCopilotAnswersCashFlowQuestions({
           ...financialData,
-          netCashFlow,
           question: promptText,
         });
         responseText = response.answer;
