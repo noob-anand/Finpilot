@@ -8,36 +8,14 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {
+  FinancialDataSummaryInputSchema,
+  FinancialDataSummaryOutputSchema,
+  type FinancialDataSummaryInput,
+  type FinancialDataSummaryOutput,
+} from '@/ai/schemas';
 
-const FinancialDataSummaryInputSchema = z.object({
-  cashInflow: z.number().describe('Total cash inflow for the period.'),
-  cashOutflow: z.number().describe('Total cash outflow for the period.'),
-  unpaidInvoicesCount: z.number().describe('Number of unpaid invoices.'),
-  expenseRatio: z
-    .number()
-    .describe(
-      'The ratio of expenses to revenue, expressed as a decimal (e.g., 0.6 for 60%).'
-    ),
-  delayedReceivablesRatio: z
-    .number()
-    .describe(
-      'The ratio of receivables that are past due to total receivables, expressed as a decimal (e.g., 0.3 for 30%).'
-    ),
-});
-export type FinancialDataSummaryInput = z.infer<
-  typeof FinancialDataSummaryInputSchema
->;
-
-const FinancialDataSummaryOutputSchema = z.object({
-  summary: z.string().describe('A plain English summary of the financial health.'),
-  recommendations: z
-    .string()
-    .describe('Actionable recommendations for improving financial health.'),
-});
-export type FinancialDataSummaryOutput = z.infer<
-  typeof FinancialDataSummaryOutputSchema
->;
+export {type FinancialDataSummaryInput, type FinancialDataSummaryOutput};
 
 export async function summarizeFinancialData(
   input: FinancialDataSummaryInput
@@ -55,6 +33,7 @@ Here is the financial data:
 
 Cash Inflow: {{cashInflow}}
 Cash Outflow: {{cashOutflow}}
+Net Cash Flow: {{netCashFlow}}
 Unpaid Invoices Count: {{unpaidInvoicesCount}}
 Expense Ratio: {{expenseRatio}}
 Delayed Receivables Ratio: {{delayedReceivablesRatio}}

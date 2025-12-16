@@ -8,29 +8,17 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {
+  AiCopilotSuggestsImprovementsInputSchema,
+  AiCopilotSuggestsImprovementsOutputSchema,
+  type AiCopilotSuggestsImprovementsInput,
+  type AiCopilotSuggestsImprovementsOutput,
+} from '@/ai/schemas';
 
-const AiCopilotSuggestsImprovementsInputSchema = z.object({
-  cashInflow: z.number().describe('Total cash inflow for the month.'),
-  cashOutflow: z.number().describe('Total cash outflow for the month.'),
-  netCashFlow: z.number().describe('Net cash flow for the month.'),
-  unpaidInvoicesCount: z.number().describe('Number of unpaid invoices.'),
-  transactionPatterns: z
-    .string()
-    .describe('Description of transaction patterns.'),
-});
-export type AiCopilotSuggestsImprovementsInput = z.infer<
-  typeof AiCopilotSuggestsImprovementsInputSchema
->;
-
-const AiCopilotSuggestsImprovementsOutputSchema = z.object({
-  suggestions: z
-    .string()
-    .describe('AI-generated insights and recommendations for financial improvements.'),
-});
-export type AiCopilotSuggestsImprovementsOutput = z.infer<
-  typeof AiCopilotSuggestsImprovementsOutputSchema
->;
+export {
+  type AiCopilotSuggestsImprovementsInput,
+  type AiCopilotSuggestsImprovementsOutput,
+};
 
 export async function aiCopilotSuggestsImprovements(
   input: AiCopilotSuggestsImprovementsInput

@@ -90,11 +90,13 @@ export default function AiCopilot() {
 
     try {
       const financialData = getFinancialSummary();
+      const netCashFlow = financialData.cashInflow - financialData.cashOutflow;
       let responseText = '';
       
       if (promptText.toLowerCase().includes('improve')) {
         const response = await aiCopilotSuggestsImprovements({
             ...financialData,
+            netCashFlow,
         });
         responseText = response.suggestions;
       } else if (promptText.toLowerCase().includes('summarize')) {
@@ -102,6 +104,7 @@ export default function AiCopilot() {
         const expenseRatio = financialData.cashOutflow / (financialData.cashInflow || 1);
         const response = await summarizeFinancialData({
             ...financialData,
+            netCashFlow,
             delayedReceivablesRatio,
             expenseRatio,
         });
@@ -109,6 +112,7 @@ export default function AiCopilot() {
       } else {
         const response = await aiCopilotAnswersCashFlowQuestions({
           ...financialData,
+          netCashFlow,
           question: promptText,
         });
         responseText = response.answer;

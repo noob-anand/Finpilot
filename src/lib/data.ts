@@ -52,6 +52,8 @@ export const getFinancialSummary = (): FinancialSummary => {
     .filter(t => t.type === 'outflow')
     .reduce((sum, t) => sum + t.amount, 0);
   
+  const netCashFlow = cashInflow - cashOutflow;
+
   const netTaxes = invoices.reduce((sum, invoice) => sum + (invoice.taxAmount || 0), 0);
 
   const unpaidInvoicesCount = invoices.filter(
@@ -61,6 +63,7 @@ export const getFinancialSummary = (): FinancialSummary => {
   return {
     cashInflow,
     cashOutflow,
+    netCashFlow,
     netTaxes,
     unpaidInvoicesCount,
     transactionPatterns: 'Recurring subscriptions and variable client payments.'

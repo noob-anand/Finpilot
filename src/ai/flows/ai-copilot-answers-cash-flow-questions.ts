@@ -10,24 +10,16 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { summarizeFinancialData, type FinancialDataSummaryInput } from './ai-summarize-financial-data';
-import { FinancialDataSummaryOutputSchema } from './ai-summarize-financial-data';
-import { FinancialDataSummaryInputSchema } from './ai-summarize-financial-data';
+import { summarizeFinancialData } from './ai-summarize-financial-data';
+import {
+  AICopilotAnswersCashFlowQuestionsInputSchema,
+  AICopilotAnswersCashFlowQuestionsOutputSchema,
+  type AICopilotAnswersCashFlowQuestionsInput,
+  type AICopilotAnswersCashFlowQuestionsOutput
+} from '@/ai/schemas';
 
-const AICopilotAnswersCashFlowQuestionsInputSchema = z.object({
-  question: z.string().describe('The user question about their cash flow.'),
-  cashInflow: z.number().describe('The total cash inflow.'),
-  cashOutflow: z.number().describe('The total cash outflow.'),
-  netCashFlow: z.number().describe('The net cash flow.'),
-  unpaidInvoicesCount: z.number().describe('The number of unpaid invoices.'),
-  transactionPatterns: z.string().describe('Description of transaction patterns.'),
-});
-export type AICopilotAnswersCashFlowQuestionsInput = z.infer<typeof AICopilotAnswersCashFlowQuestionsInputSchema>;
+export {type AICopilotAnswersCashFlowQuestionsInput, type AICopilotAnswersCashFlowQuestionsOutput};
 
-const AICopilotAnswersCashFlowQuestionsOutputSchema = z.object({
-  answer: z.string().describe('The AI Copilot answer to the user question.'),
-});
-export type AICopilotAnswersCashFlowQuestionsOutput = z.infer<typeof AICopilotAnswersCashFlowQuestionsOutputSchema>;
 
 export async function aiCopilotAnswersCashFlowQuestions(input: AICopilotAnswersCashFlowQuestionsInput): Promise<AICopilotAnswersCashFlowQuestionsOutput> {
   return aiCopilotAnswersCashFlowQuestionsFlow(input);
@@ -62,6 +54,7 @@ const aiCopilotAnswersCashFlowQuestionsFlow = ai.defineFlow(
     const financialSummary = await summarizeFinancialData({
         cashInflow: input.cashInflow,
         cashOutflow: input.cashOutflow,
+        netCashFlow: input.netCashFlow,
         unpaidInvoicesCount: input.unpaidInvoicesCount,
         expenseRatio: expenseRatio,
         delayedReceivablesRatio: delayedReceivablesRatio,
