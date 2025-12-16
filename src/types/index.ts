@@ -18,7 +18,7 @@ export type Invoice = {
 export type FinancialSummary = {
   cashInflow: number;
   cashOutflow: number;
-  netCashFlow: number;
+  netTaxes: number;
   unpaidInvoicesCount: number;
   transactionPatterns: string;
 };

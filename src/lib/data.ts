@@ -33,8 +33,10 @@ export const getFinancialSummary = (): FinancialSummary => {
   const cashOutflow = transactions
     .filter(t => t.type === 'outflow')
     .reduce((sum, t) => sum + t.amount, 0);
-
-  const netCashFlow = cashInflow - cashOutflow;
+  
+  const netIncome = cashInflow - cashOutflow;
+  const taxRate = 0.20; // Assuming a 20% tax rate
+  const netTaxes = netIncome > 0 ? netIncome * taxRate : 0;
 
   const unpaidInvoicesCount = invoices.filter(
     i => i.status === 'unpaid' || i.status === 'overdue'
@@ -43,7 +45,7 @@ export const getFinancialSummary = (): FinancialSummary => {
   return {
     cashInflow,
     cashOutflow,
-    netCashFlow,
+    netTaxes,
     unpaidInvoicesCount,
     transactionPatterns: 'Recurring subscriptions and variable client payments.'
   };

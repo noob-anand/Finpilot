@@ -1,8 +1,8 @@
 import {
   ArrowDownLeft,
   ArrowUpRight,
-  CircleDollarSign,
   FileWarning,
+  Landmark,
 } from 'lucide-react';
 import {
   Card,
@@ -41,17 +41,11 @@ export function DashboardCards() {
       bgColor: 'bg-red-100 dark:bg-red-900/50',
     },
     {
-      title: 'Net Cash Flow',
-      amount: formatCurrency(summary.netCashFlow),
-      icon: CircleDollarSign,
-      color:
-        summary.netCashFlow >= 0
-          ? 'text-cyan-800 dark:text-cyan-200'
-          : 'text-orange-800 dark:text-orange-200',
-      bgColor:
-        summary.netCashFlow >= 0
-          ? 'bg-cyan-100 dark:bg-cyan-900/50'
-          : 'bg-orange-100 dark:bg-orange-900/50',
+      title: 'Net Taxes',
+      amount: formatCurrency(summary.netTaxes),
+      icon: Landmark,
+      color: 'text-blue-800 dark:text-blue-200',
+      bgColor: 'bg-blue-100 dark:bg-blue-900/50',
     },
     {
       title: 'Unpaid Invoices',
@@ -70,7 +64,7 @@ export function DashboardCards() {
             <CardTitle className={cn("text-sm font-medium", card.color)}>{card.title}</CardTitle>
             <card.icon className={cn('h-5 w-5', card.color)} />
           </CardHeader>
-          <CardContent className="p-0">
+          <CardContent>
             <div className={cn('text-2xl font-bold p-6', card.color)}>{card.amount}</div>
           </CardContent>
         </Card>
