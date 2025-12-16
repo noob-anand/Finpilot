@@ -73,7 +73,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       </Sidebar>
       <SidebarInset>
         <div className="min-h-screen">
-          <main className="flex-1 p-4 lg:p-6 bg-background rounded-xl m-4">{children}</main>
+          <main className="flex-1 p-4 lg:p-6">{children}</main>
         </div>
         <AiCopilot />
       </SidebarInset>
