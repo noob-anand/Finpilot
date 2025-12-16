@@ -9,6 +9,8 @@ import {
   Tooltip,
   Line,
   Legend,
+  Area,
+  CartesianGrid,
 } from 'recharts';
 import {
   Card,
@@ -30,11 +32,11 @@ import {
 const chartConfig = {
   inflow: {
     label: 'Inflow',
-    color: 'hsl(142.1 76.2% 36.3%)', // green
+    color: 'hsl(var(--chart-1))',
   },
   outflow: {
     label: 'Outflow',
-    color: 'hsl(0 84.2% 60.2%)', // red
+    color: 'hsl(var(--chart-2))',
   },
   netProfit: {
     label: 'Net Profit',
@@ -55,6 +57,12 @@ export function DashboardChart() {
         <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
           <ResponsiveContainer width="100%" height={300}>
             <ComposedChart data={data}>
+              <defs>
+                <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="50%" stopColor="hsl(142.1 76.2% 36.3%)" stopOpacity={1}/>
+                  <stop offset="50%" stopColor="hsl(0 84.2% 60.2%)" stopOpacity={1}/>
+                </linearGradient>
+              </defs>
               <XAxis
                 dataKey="month"
                 stroke="#888888"
@@ -87,7 +95,7 @@ export function DashboardChart() {
               <Line
                 type="monotone"
                 dataKey="netProfit"
-                stroke="var(--color-netProfit)"
+                stroke="url(#splitColor)"
                 strokeWidth={2}
                 dot={{
                   fill: 'var(--color-netProfit)',
