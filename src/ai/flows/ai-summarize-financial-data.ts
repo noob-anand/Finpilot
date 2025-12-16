@@ -27,7 +27,7 @@ const summarizeFinancialDataFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await ai.generate({
-      model: 'googleai/gemini-1.5-flash',
+      model: 'gemini-pro',
       output: {
         schema: FinancialDataSummaryOutputSchema,
       },
