@@ -109,7 +109,10 @@ export default function AiCopilot() {
         responseText = `${response.summary}\n\n**Recommendations:**\n${response.recommendations}`;
       } else {
         const response = await aiCopilotAnswersCashFlowQuestions({
-          ...financialData,
+          cashInflow: financialData.cashInflow,
+          cashOutflow: financialData.cashOutflow,
+          netCashFlow: financialData.netCashFlow,
+          unpaidInvoicesCount: financialData.unpaidInvoicesCount,
           question: promptText,
         });
         responseText = response.answer;
