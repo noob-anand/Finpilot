@@ -88,6 +88,31 @@ export const getAssetAllocation = (): AssetAllocation[] => {
     return Object.entries(allocation).map(([name, value]) => ({ name, value }));
 }
 
+export const getCapitalAllocation = (): AssetAllocation[] => {
+    const financialSummary = getFinancialSummary();
+    const portfolioSummary = getPortfolioSummary();
+
+    const operatingExpenses = financialSummary.cashOutflow;
+    const taxes = financialSummary.netTaxes;
+    const investments = portfolioSummary.totalInvested;
+
+    const totalAllocation = operatingExpenses + taxes + investments;
+
+    if (totalAllocation === 0) {
+        return [
+            { name: 'Operating Expenses', value: 1 },
+            { name: 'Taxes', value: 1 },
+            { name: 'Investments', value: 1 },
+        ];
+    }
+    
+    return [
+        { name: 'Operating Expenses', value: operatingExpenses },
+        { name: 'Taxes', value: taxes },
+        { name: 'Investments', value: investments }
+    ];
+};
+
 
 export const getMonthlyChartData = () => {
   const data = [];
