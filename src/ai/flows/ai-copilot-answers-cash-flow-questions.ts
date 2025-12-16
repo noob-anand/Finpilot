@@ -8,7 +8,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { summarizeFinancialData } from './ai-summarize-financial-data';
+import {summarizeFinancialData} from './ai-summarize-financial-data';
 import {
   AICopilotAnswersCashFlowQuestionsInputSchema,
   AICopilotAnswersCashFlowQuestionsOutputSchema,
@@ -43,6 +43,7 @@ const aiCopilotAnswersCashFlowQuestionsFlow = ai.defineFlow(
     name: 'aiCopilotAnswersCashFlowQuestionsFlow',
     inputSchema: AICopilotAnswersCashFlowQuestionsInputSchema,
     outputSchema: AICopilotAnswersCashFlowQuestionsOutputSchema,
+    model: 'googleai/gemini-1.5-flash',
   },
   async input => {
     const expenseRatio =

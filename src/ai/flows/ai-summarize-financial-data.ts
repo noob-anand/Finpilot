@@ -3,8 +3,6 @@
  * @fileOverview Summarizes the financial health of a business, highlighting cash flow stress, delayed receivables, and high expense ratios.
  *
  * - summarizeFinancialData - A function that summarizes financial data.
- * - FinancialDataSummaryInput - The input type for the summarizeFinancialData function.
- * - FinancialDataSummaryOutput - The return type for the summarizeFinancialData function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -46,6 +44,7 @@ const summarizeFinancialDataFlow = ai.defineFlow(
     name: 'summarizeFinancialDataFlow',
     inputSchema: FinancialDataSummaryInputSchema,
     outputSchema: FinancialDataSummaryOutputSchema,
+    model: 'googleai/gemini-1.5-flash',
   },
   async input => {
     const {output} = await summarizeFinancialDataPrompt(input);
