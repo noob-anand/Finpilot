@@ -47,10 +47,15 @@ const suggestedQuestions = [
   'Summarize my financial health.',
 ];
 
+const MAX_QUESTIONS = 4;
+
 export default function AiCopilot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const questionCount = messages.filter((m) => m.role === 'user').length;
+  const isLimitReached = questionCount >= MAX_QUESTIONS;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -69,6 +74,9 @@ export default function AiCopilot() {
   }, [messages]);
 
   const handlePrompt = async (promptText: string) => {
+    if (isLimitReached) {
+      return;
+    }
     form.reset();
     setIsLoading(true);
 
@@ -81,7 +89,6 @@ export default function AiCopilot() {
 
     try {
       const financialData = getFinancialSummary();
-      const monthlyData = getMonthlyChartData();
       let responseText = '';
       
       if (promptText.toLowerCase().includes('improve')) {
@@ -101,9 +108,7 @@ export default function AiCopilot() {
       } else {
         const response = await aiCopilotAnswersCashFlowQuestions({
           ...financialData,
-          unpaidInvoiceCount: financialData.unpaidInvoicesCount,
           question: promptText,
-          netCashFlow: financialData.cashInflow - financialData.cashOutflow,
         });
         responseText = response.answer;
       }
@@ -202,6 +207,13 @@ export default function AiCopilot() {
                       </div>
                     </div>
                   )}
+                   {isLimitReached && (
+                    <div className="text-center p-4 rounded-lg bg-amber-100 dark:bg-amber-900/50 border border-amber-200 dark:border-amber-800">
+                      <p className="text-sm text-amber-800 dark:text-amber-200">
+                        You have reached the question limit for this session.
+                      </p>
+                    </div>
+                  )}
               </div>
             </ScrollArea>
             <SheetFooter className="mt-auto flex flex-col gap-2">
@@ -213,7 +225,7 @@ export default function AiCopilot() {
                       size="sm"
                       className="text-xs"
                       onClick={() => handlePrompt(q)}
-                      disabled={isLoading}
+                      disabled={isLoading || isLimitReached}
                     >
                       {q}
                     </Button>
@@ -231,16 +243,16 @@ export default function AiCopilot() {
                       <FormItem className="flex-1">
                         <FormControl>
                           <Input
-                            placeholder="e.g., How can I improve cash flow?"
+                            placeholder={isLimitReached ? 'Question limit reached' : 'e.g., How can I improve cash flow?'}
                             {...field}
-                            disabled={isLoading}
+                            disabled={isLoading || isLimitReached}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" size="icon" disabled={isLoading}>
+                  <Button type="submit" size="icon" disabled={isLoading || isLimitReached}>
                     <Send className="h-4 w-4" />
                   </Button>
                 </form>
@@ -252,5 +264,3 @@ export default function AiCopilot() {
     </>
   );
 }
-
-    
