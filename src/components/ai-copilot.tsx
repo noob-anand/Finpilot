@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Bot, Sparkles, Home } from 'lucide-react';
+import { Bot, Sparkles, Home, Send } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -16,6 +16,7 @@ import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { qnaTree, rootQuestionIds, type QnaNode } from '@/lib/qna-data';
+import { Textarea } from '@/components/ui/textarea';
 
 type Message = {
   id: string;
@@ -29,6 +30,7 @@ export default function AiCopilot() {
     useState<string[]>(rootQuestionIds);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -42,6 +44,8 @@ export default function AiCopilot() {
   const handleQuestionSelect = (questionId: string) => {
     const node: QnaNode = qnaTree[questionId];
     if (!node) return;
+
+    setInputValue(node.questionText);
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -57,12 +61,38 @@ export default function AiCopilot() {
 
     setMessages((prev) => [...prev, userMessage, assistantMessage]);
     setCurrentQuestionIds(node.followUpQuestionIds);
+    setInputValue('');
   };
 
   const handleReset = () => {
     setMessages([]);
     setCurrentQuestionIds(rootQuestionIds);
+    setInputValue('');
   };
+  
+  const handleSend = () => {
+    if (!inputValue.trim()) return;
+
+    const matchedQuestionId = Object.keys(qnaTree).find(id => qnaTree[id].questionText.toLowerCase() === inputValue.toLowerCase().trim());
+    if (matchedQuestionId) {
+        handleQuestionSelect(matchedQuestionId);
+    } else {
+         const userMessage: Message = {
+            id: `user-${Date.now()}`,
+            text: inputValue,
+            role: 'user',
+        };
+
+        const assistantMessage: Message = {
+            id: `assistant-${Date.now()}`,
+            text: "I'm sorry, I can only respond to the suggested questions. Please select one of the options.",
+            role: 'assistant',
+        };
+        setMessages((prev) => [...prev, userMessage, assistantMessage]);
+        setInputValue('');
+    }
+  }
+
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
@@ -132,8 +162,8 @@ export default function AiCopilot() {
               ))}
             </div>
           </ScrollArea>
-          <SheetFooter className="mt-auto flex flex-col gap-2">
-            <div className="flex gap-2 flex-wrap">
+          <SheetFooter className="mt-auto flex flex-col gap-4">
+             <div className="flex gap-2 flex-wrap justify-start">
               {currentQuestionIds.map((id) => (
                 <Button
                   key={id}
@@ -156,6 +186,24 @@ export default function AiCopilot() {
                   Back to Start
                 </Button>
               )}
+            </div>
+            <div className="flex items-center gap-2">
+                 <Textarea 
+                    placeholder="Type your message..." 
+                    rows={1} 
+                    className="flex-1 resize-none"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSend();
+                        }
+                    }}
+                />
+                 <Button onClick={handleSend} size="icon" className="shrink-0">
+                    <Send className="h-4 w-4" />
+                </Button>
             </div>
           </SheetFooter>
         </SheetContent>
