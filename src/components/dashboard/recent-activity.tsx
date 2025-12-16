@@ -40,7 +40,7 @@ export function RecentActivity() {
   };
 
   return (
-    <Card className="h-full">
+    <Card>
       <CardHeader>
         <CardTitle>Recent Activity</CardTitle>
         <CardDescription>
