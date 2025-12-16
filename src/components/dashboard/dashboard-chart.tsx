@@ -30,11 +30,11 @@ import {
 const chartConfig = {
   inflow: {
     label: 'Inflow',
-    color: 'hsl(var(--chart-1))',
+    color: 'hsl(142.1 76.2% 36.3%)', // green
   },
   outflow: {
     label: 'Outflow',
-    color: 'hsl(var(--chart-2))',
+    color: 'hsl(0 84.2% 60.2%)', // red
   },
   netProfit: {
     label: 'Net Profit',
