@@ -163,7 +163,7 @@ export default function AiCopilot() {
             </div>
           </ScrollArea>
           <SheetFooter className="mt-auto flex flex-col gap-4">
-             <div className="flex gap-2 flex-wrap justify-start">
+            <div className="flex gap-2 flex-wrap justify-start">
               {currentQuestionIds.map((id) => (
                 <Button
                   key={id}
