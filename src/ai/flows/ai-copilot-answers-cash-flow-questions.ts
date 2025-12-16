@@ -18,8 +18,6 @@ import {
   type AICopilotAnswersCashFlowQuestionsOutput
 } from '@/ai/schemas';
 
-export type { AICopilotAnswersCashFlowQuestionsInput, AICopilotAnswersCashFlowQuestionsOutput };
-
 export async function aiCopilotAnswersCashFlowQuestions(input: AICopilotAnswersCashFlowQuestionsInput): Promise<AICopilotAnswersCashFlowQuestionsOutput> {
   return aiCopilotAnswersCashFlowQuestionsFlow(input);
 }

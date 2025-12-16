@@ -15,11 +15,6 @@ import {
   type AiCopilotSuggestsImprovementsOutput,
 } from '@/ai/schemas';
 
-export {
-  type AiCopilotSuggestsImprovementsInput,
-  type AiCopilotSuggestsImprovementsOutput,
-};
-
 export async function aiCopilotSuggestsImprovements(
   input: AiCopilotSuggestsImprovementsInput
 ): Promise<AiCopilotSuggestsImprovementsOutput> {

@@ -30,6 +30,7 @@ import { summarizeFinancialData } from '@/ai/flows/ai-summarize-financial-data';
 import { getFinancialSummary } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { AiCopilotSuggestsImprovementsInput } from '@/ai/schemas';
 
 const formSchema = z.object({
   prompt: z.string().min(1, 'Please enter a question.'),
@@ -96,6 +97,7 @@ export default function AiCopilot() {
       if (promptText.toLowerCase().includes('improve')) {
         const response = await aiCopilotSuggestsImprovements({
             ...financialData,
+            netCashFlow,
         });
         responseText = response.suggestions;
       } else if (promptText.toLowerCase().includes('summarize')) {
@@ -103,6 +105,7 @@ export default function AiCopilot() {
         const expenseRatio = cashInflow > 0 ? cashOutflow / cashInflow : 0;
         const response = await summarizeFinancialData({
             ...financialData,
+            netCashFlow,
             delayedReceivablesRatio,
             expenseRatio,
         });
