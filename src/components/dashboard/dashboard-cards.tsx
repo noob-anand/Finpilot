@@ -46,11 +46,11 @@ export function DashboardCards() {
       icon: CircleDollarSign,
       color:
         summary.netCashFlow >= 0
-          ? 'text-blue-600 dark:text-blue-400'
+          ? 'text-[#2e22ff]'
           : 'text-orange-600 dark:text-orange-400',
       bgColor:
         summary.netCashFlow >= 0
-          ? 'bg-blue-100 dark:bg-blue-900/50'
+          ? 'bg-[#eaf0ff] dark:bg-blue-900/50'
           : 'bg-orange-100 dark:bg-orange-900/50',
     },
     {
@@ -65,13 +65,13 @@ export function DashboardCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {cardData.map((card) => (
-        <Card key={card.title} className={cn('border-0 shadow-none', card.bgColor)}>
+        <Card key={card.title}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-            <card.icon className={`h-5 w-5 ${card.color}`} />
+            <card.icon className={cn('h-5 w-5', card.color)} />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{card.amount}</div>
+          <CardContent className={cn('rounded-lg', card.bgColor)}>
+            <div className={cn('text-2xl font-bold', card.color)}>{card.amount}</div>
           </CardContent>
         </Card>
       ))}
