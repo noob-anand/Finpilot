@@ -9,8 +9,6 @@ import {
   Tooltip,
   Line,
   Legend,
-  Area,
-  CartesianGrid,
 } from 'recharts';
 import {
   Card,
@@ -58,13 +56,9 @@ export function DashboardChart() {
           <ResponsiveContainer width="100%" height={300}>
             <ComposedChart data={data}>
               <defs>
-                <linearGradient id="splitColorArea" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(142.1 76.2% 36.3%)" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="hsl(0 84.2% 60.2%)" stopOpacity={0.8}/>
-                </linearGradient>
                 <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="50%" stopColor="hsl(142.1 76.2% 36.3%)" stopOpacity={1}/>
-                  <stop offset="50%" stopColor="hsl(0 84.2% 60.2%)" stopOpacity={1}/>
+                  <stop offset="5%" stopColor="hsl(142.1 76.2% 36.3%)" stopOpacity={1}/>
+                  <stop offset="95%" stopColor="hsl(0 84.2% 60.2%)" stopOpacity={1}/>
                 </linearGradient>
               </defs>
               <XAxis
@@ -88,12 +82,19 @@ export function DashboardChart() {
                 content={<ChartTooltipContent />}
               />
               <ChartLegend content={<ChartLegendContent />} />
-              <Area 
-                yAxisId="right" 
-                type="monotone" 
-                dataKey="netProfit" 
-                fill="url(#splitColorArea)" 
-                stroke="transparent" 
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey="netProfit"
+                stroke="url(#splitColor)"
+                strokeWidth={2}
+                dot={{
+                  fill: "hsl(var(--chart-3))",
+                  r: 4,
+                }}
+                activeDot={{
+                   r: 6
+                }}
               />
               <Bar
                 yAxisId="left"
