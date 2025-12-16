@@ -18,8 +18,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getTaxes } from '@/lib/data';
-import type { Tax } from '@/types';
+import { getTaxes, getInvoices } from '@/lib/data';
+import type { Tax, Invoice } from '@/types';
 import {
   Sheet,
   SheetContent,
@@ -31,6 +31,7 @@ import { CreateTaxForm } from './create-tax-form';
 
 export function TaxesTable() {
   const [taxes, setTaxes] = useState<Tax[]>(getTaxes());
+  const [invoices] = useState<Invoice[]>(getInvoices());
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const handleAddTax = (newTax: Omit<Tax, 'id'>) => {
@@ -42,6 +43,20 @@ export function TaxesTable() {
   const formatPercentage = (rate: number) => {
     return `${(rate * 100).toFixed(2)}%`;
   };
+  
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  };
+
+  const calculateTotalTaxAmount = (taxId: string) => {
+    return invoices
+      .filter((invoice) => invoice.taxId === taxId && invoice.taxAmount)
+      .reduce((sum, invoice) => sum + invoice.taxAmount!, 0);
+  };
+
 
   return (
     <Card>
@@ -74,16 +89,16 @@ export function TaxesTable() {
           <TableHeader>
             <TableRow>
               <TableHead>Tax Name</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead className="text-right">Rate</TableHead>
+              <TableHead className="text-center">Rate</TableHead>
+              <TableHead className="text-right">Total Tax Amount</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {taxes.map((tax) => (
               <TableRow key={tax.id}>
                 <TableCell className="font-medium">{tax.name}</TableCell>
-                <TableCell>{tax.type}</TableCell>
-                <TableCell className="text-right">{formatPercentage(tax.rate)}</TableCell>
+                <TableCell className="text-center">{formatPercentage(tax.rate)}</TableCell>
+                <TableCell className="text-right font-semibold">{formatCurrency(calculateTotalTaxAmount(tax.id))}</TableCell>
               </TableRow>
             ))}
           </TableBody>

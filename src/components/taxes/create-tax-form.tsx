@@ -13,13 +13,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import type { Tax } from '@/types';
 
 const formSchema = z.object({
@@ -28,7 +21,6 @@ const formSchema = z.object({
     .number({ invalid_type_error: 'Rate must be a number' })
     .min(0, 'Rate must be non-negative.')
     .max(100, 'Rate cannot exceed 100.'),
-  type: z.enum(['GST', 'VAT', 'Sales Tax', 'Income Tax', 'Payroll Tax', 'Service Tax', 'Withholding Tax']),
 });
 
 type CreateTaxFormProps = {
@@ -40,7 +32,6 @@ export function CreateTaxForm({ onTaxCreate }: CreateTaxFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      type: 'GST',
     },
   });
 
@@ -77,32 +68,6 @@ export function CreateTaxForm({ onTaxCreate }: CreateTaxFormProps) {
               <FormControl>
                 <Input type="number" placeholder="e.g., 18" {...field} />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tax Type</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a tax type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="GST">GST</SelectItem>
-                  <SelectItem value="VAT">VAT</SelectItem>
-                  <SelectItem value="Sales Tax">Sales Tax</SelectItem>
-                  <SelectItem value="Income Tax">Income Tax</SelectItem>
-                  <SelectItem value="Payroll Tax">Payroll Tax</SelectItem>
-                  <SelectItem value="Service Tax">Service Tax</SelectItem>
-                  <SelectItem value="Withholding Tax">Withholding Tax</SelectItem>
-                </SelectContent>
-              </Select>
               <FormMessage />
             </FormItem>
           )}

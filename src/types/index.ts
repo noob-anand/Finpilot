@@ -10,7 +10,6 @@ export type Tax = {
   id: string;
   name: string;
   rate: number;
-  type: 'GST' | 'VAT' | 'Sales Tax' | 'Income Tax' | 'Payroll Tax' | 'Service Tax' | 'Withholding Tax';
 };
 
 export type Invoice = {

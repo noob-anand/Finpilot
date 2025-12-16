@@ -15,9 +15,9 @@ export const transactions: Transaction[] = [
 ];
 
 export const taxes: Tax[] = [
-    { id: 'TAX-001', name: 'GST (18%)', rate: 0.18, type: 'GST' },
-    { id: 'TAX-002', name: 'VAT (20%)', rate: 0.20, type: 'VAT' },
-    { id: 'TAX-003', name: 'Service Tax (10%)', rate: 0.10, type: 'Service Tax' },
+    { id: 'TAX-001', name: 'GST', rate: 0.18 },
+    { id: 'TAX-002', name: 'VAT', rate: 0.20 },
+    { id: 'TAX-003', name: 'Service Tax', rate: 0.10 },
 ];
 
 export const invoices: Invoice[] = [
