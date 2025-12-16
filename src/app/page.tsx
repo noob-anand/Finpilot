@@ -14,8 +14,8 @@ export default function DashboardPage() {
           <DashboardChart />
         </div>
         <div className="lg:col-span-2 space-y-6">
-          <RecentActivity />
           <CapitalAllocationChart />
+          <RecentActivity />
         </div>
       </div>
     </div>
