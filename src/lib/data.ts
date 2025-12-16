@@ -1,4 +1,4 @@
-import type { Transaction, Invoice, FinancialSummary } from '@/types';
+import type { Transaction, Invoice, FinancialSummary, Tax } from '@/types';
 import { subMonths, format, subDays } from 'date-fns';
 
 const today = new Date();
@@ -14,16 +14,24 @@ export const transactions: Transaction[] = [
   { id: 'txn8', date: format(subDays(today, 20), 'yyyy-MM-dd'), description: "Utilities", amount: 250, type: 'outflow' },
 ];
 
+export const taxes: Tax[] = [
+    { id: 'TAX-001', name: 'GST (18%)', rate: 0.18, type: 'GST' },
+    { id: 'TAX-002', name: 'VAT (20%)', rate: 0.20, type: 'VAT' },
+    { id: 'TAX-003', name: 'Service Tax (10%)', rate: 0.10, type: 'Service Tax' },
+];
+
 export const invoices: Invoice[] = [
-  { id: 'INV-001', customer: 'Creative Solutions Ltd.', amount: 2500, status: 'paid', issueDate: format(subDays(today, 32), 'yyyy-MM-dd'), dueDate: format(subDays(today, 2), 'yyyy-MM-dd') },
+  { id: 'INV-001', customer: 'Creative Solutions Ltd.', amount: 2500, status: 'paid', issueDate: format(subDays(today, 32), 'yyyy-MM-dd'), dueDate: format(subDays(today, 2), 'yyyy-MM-dd'), taxId: 'TAX-001', taxAmount: 450 },
   { id: 'INV-002', customer: 'Innovate Inc.', amount: 1800, status: 'paid', issueDate: format(subDays(today, 20), 'yyyy-MM-dd'), dueDate: format(subDays(today, 5), 'yyyy-MM-dd') },
-  { id: 'INV-003', customer: 'Marketing Gurus', amount: 4200, status: 'unpaid', issueDate: format(subDays(today, 15), 'yyyy-MM-dd'), dueDate: format(today, 'yyyy-MM-dd') },
+  { id: 'INV-003', customer: 'Marketing Gurus', amount: 4200, status: 'unpaid', issueDate: format(subDays(today, 15), 'yyyy-MM-dd'), dueDate: format(today, 'yyyy-MM-dd'), taxId: 'TAX-003', taxAmount: 420 },
   { id: 'INV-004', customer: 'Tech Forward', amount: 3000, status: 'unpaid', issueDate: format(subDays(today, 5), 'yyyy-MM-dd'), dueDate: format(subDays(today, -10), 'yyyy-MM-dd') },
-  { id: 'INV-005', customer: 'Global Exports', amount: 5500, status: 'overdue', issueDate: format(subDays(today, 45), 'yyyy-MM-dd'), dueDate: format(subDays(today, 15), 'yyyy-MM-dd') },
+  { id: 'INV-005', customer: 'Global Exports', amount: 5500, status: 'overdue', issueDate: format(subDays(today, 45), 'yyyy-MM-dd'), dueDate: format(subDays(today, 15), 'yyyy-MM-dd'), taxId: 'TAX-002', taxAmount: 1100 },
 ];
 
 export const getTransactions = (): Transaction[] => transactions;
 export const getInvoices = (): Invoice[] => invoices;
+export const getTaxes = (): Tax[] => taxes;
+
 
 export const getFinancialSummary = (): FinancialSummary => {
   const cashInflow = transactions
@@ -34,9 +42,7 @@ export const getFinancialSummary = (): FinancialSummary => {
     .filter(t => t.type === 'outflow')
     .reduce((sum, t) => sum + t.amount, 0);
   
-  const netIncome = cashInflow - cashOutflow;
-  const taxRate = 0.20; // Assuming a 20% tax rate
-  const netTaxes = netIncome > 0 ? netIncome * taxRate : 0;
+  const netTaxes = invoices.reduce((sum, invoice) => sum + (invoice.taxAmount || 0), 0);
 
   const unpaidInvoicesCount = invoices.filter(
     i => i.status === 'unpaid' || i.status === 'overdue'

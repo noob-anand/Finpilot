@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { DollarSign, Home, Receipt, Wallet } from 'lucide-react';
+import { DollarSign, Home, Receipt, Wallet, Landmark } from 'lucide-react';
 
 import {
   SidebarProvider,
@@ -26,6 +26,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
     { href: '/', label: 'Dashboard', icon: Home },
     { href: '/invoices', label: 'Invoices', icon: Receipt },
     { href: '/transactions', label: 'Transactions', icon: Wallet },
+    { href: '/taxes', label: 'Taxes', icon: Landmark },
   ];
 
   return (

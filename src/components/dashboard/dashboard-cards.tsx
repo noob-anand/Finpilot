@@ -43,7 +43,7 @@ export function DashboardCards() {
       bgColor: 'bg-red-100 dark:bg-red-900/50',
     },
     {
-      title: 'Net Taxes',
+      title: 'Net Taxes Payable',
       amount: formatCurrency(summary.netTaxes),
       icon: Landmark,
       color: 'text-cyan-800 dark:text-cyan-200',

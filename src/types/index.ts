@@ -6,6 +6,13 @@ export type Transaction = {
   type: 'inflow' | 'outflow';
 };
 
+export type Tax = {
+  id: string;
+  name: string;
+  rate: number;
+  type: 'GST' | 'VAT' | 'Sales Tax' | 'Income Tax' | 'Payroll Tax' | 'Service Tax' | 'Withholding Tax';
+};
+
 export type Invoice = {
   id: string;
   customer: string;
@@ -13,6 +20,8 @@ export type Invoice = {
   status: 'paid' | 'unpaid' | 'overdue';
   dueDate: string;
   issueDate: string;
+  taxId?: string;
+  taxAmount?: number;
 };
 
 export type FinancialSummary = {

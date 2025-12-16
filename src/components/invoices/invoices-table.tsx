@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getInvoices } from '@/lib/data';
+import { getInvoices, getTaxes } from '@/lib/data';
 import type { Invoice } from '@/types';
 import { cn } from '@/lib/utils';
 import {
@@ -34,6 +34,7 @@ import { CreateInvoiceForm } from './create-invoice-form';
 export function InvoicesTable() {
   const [invoices, setInvoices] = useState<Invoice[]>(getInvoices());
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const taxes = getTaxes();
 
   const handleAddInvoice = (newInvoice: Omit<Invoice, 'id'>) => {
     const newId = `INV-${String(invoices.length + 1).padStart(3, '0')}`;
@@ -47,6 +48,10 @@ export function InvoicesTable() {
       currency: 'USD',
     }).format(amount);
   };
+
+  const getTotalAmount = (invoice: Invoice) => {
+    return invoice.amount + (invoice.taxAmount || 0);
+  }
 
   return (
     <Card>
@@ -80,7 +85,9 @@ export function InvoicesTable() {
             <TableRow>
               <TableHead>Invoice ID</TableHead>
               <TableHead>Customer</TableHead>
-              <TableHead>Amount</TableHead>
+              <TableHead>Base Amount</TableHead>
+              <TableHead>Tax</TableHead>
+              <TableHead>Total Amount</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Due Date</TableHead>
             </TableRow>
@@ -91,6 +98,8 @@ export function InvoicesTable() {
                 <TableCell className="font-medium">{invoice.id}</TableCell>
                 <TableCell>{invoice.customer}</TableCell>
                 <TableCell>{formatCurrency(invoice.amount)}</TableCell>
+                <TableCell>{invoice.taxAmount ? formatCurrency(invoice.taxAmount) : 'N/A'}</TableCell>
+                <TableCell className="font-semibold">{formatCurrency(getTotalAmount(invoice))}</TableCell>
                 <TableCell>
                   <Badge
                     variant={

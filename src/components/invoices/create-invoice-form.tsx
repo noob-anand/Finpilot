@@ -18,11 +18,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import type { Invoice } from '@/types';
+import type { Invoice, Tax } from '@/types';
+import { getTaxes } from '@/lib/data';
+import { useState } from 'react';
 
 const formSchema = z.object({
   customer: z.string().min(2, 'Customer name is required.'),
@@ -30,6 +39,7 @@ const formSchema = z.object({
     .number({ invalid_type_error: 'Amount must be a number' })
     .positive('Amount must be positive.'),
   dueDate: z.date({ required_error: 'A due date is required.' }),
+  taxId: z.string().optional(),
 });
 
 type CreateInvoiceFormProps = {
@@ -37,6 +47,8 @@ type CreateInvoiceFormProps = {
 };
 
 export function CreateInvoiceForm({ onInvoiceCreate }: CreateInvoiceFormProps) {
+  const [taxes] = useState<Tax[]>(getTaxes());
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,11 +57,22 @@ export function CreateInvoiceForm({ onInvoiceCreate }: CreateInvoiceFormProps) {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
+    let taxAmount: number | undefined = undefined;
+    if (values.taxId) {
+      const selectedTax = taxes.find(t => t.id === values.taxId);
+      if (selectedTax) {
+        taxAmount = values.amount * selectedTax.rate;
+      }
+    }
+
     onInvoiceCreate({
-      ...values,
+      customer: values.customer,
+      amount: values.amount,
       status: 'unpaid',
       issueDate: format(new Date(), 'yyyy-MM-dd'),
       dueDate: format(values.dueDate, 'yyyy-MM-dd'),
+      taxId: values.taxId,
+      taxAmount,
     });
     form.reset();
   };
@@ -75,10 +98,35 @@ export function CreateInvoiceForm({ onInvoiceCreate }: CreateInvoiceFormProps) {
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel>Base Amount</FormLabel>
               <FormControl>
                 <Input type="number" placeholder="e.g., 1500.00" {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="taxId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Apply Tax (Optional)</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a tax to apply" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="no-tax">No Tax</SelectItem>
+                  {taxes.map(tax => (
+                    <SelectItem key={tax.id} value={tax.id}>
+                      {tax.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
