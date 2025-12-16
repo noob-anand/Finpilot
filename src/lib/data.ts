@@ -62,3 +62,16 @@ export const getMonthlyChartData = () => {
   }
   return data;
 };
+
+export const getMonthlyChartDataWithOffset = (offset: number) => {
+  const data = [];
+  for (let i = 5; i >= 0; i--) {
+    const month = subMonths(today, i);
+    const monthName = format(month, 'MMM');
+    const inflow = Math.floor(Math.random() * (10000 - 4000 + 1)) + 4000;
+    const outflow = Math.floor(Math.random() * (8000 - 3000 + 1)) + 3000;
+    const netProfit = inflow - outflow + offset;
+    data.push({ month: monthName, inflow, outflow, netProfit });
+  }
+  return data;
+};

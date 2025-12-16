@@ -1,13 +1,13 @@
 'use client';
 
 import {
-  Bar,
   ComposedChart,
   ResponsiveContainer,
   XAxis,
   YAxis,
-  Tooltip,
+  Bar,
   Line,
+  Tooltip,
   Legend,
 } from 'recharts';
 import {
@@ -17,7 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { getMonthlyChartData } from '@/lib/data';
+import { getMonthlyChartDataWithOffset } from '@/lib/data';
 import {
   ChartContainer,
   ChartTooltip,
@@ -42,8 +42,33 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+const GAP_OFFSET = 5000;
+
 export function DashboardChart() {
-  const data = getMonthlyChartData();
+  const data = getMonthlyChartDataWithOffset(GAP_OFFSET);
+
+  const customTooltipFormatter = (value: number, name: string) => {
+    if (name === 'netProfit' && typeof value === 'number') {
+      const originalValue = value - GAP_OFFSET;
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(originalValue);
+    }
+    
+    if (typeof value === 'number') {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(value);
+    }
+
+    return value;
+  };
 
   return (
     <Card>
@@ -79,7 +104,7 @@ export function DashboardChart() {
                <YAxis yAxisId="right" orientation="right" hide={true} />
               <ChartTooltip
                 cursor={{ fill: 'hsl(var(--muted))' }}
-                content={<ChartTooltipContent />}
+                content={<ChartTooltipContent formatter={customTooltipFormatter} />}
               />
               <ChartLegend content={<ChartLegendContent />} />
               <Line
