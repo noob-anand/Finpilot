@@ -1,4 +1,4 @@
-import type { Transaction, Invoice, FinancialSummary, Tax } from '@/types';
+import type { Transaction, Invoice, FinancialSummary, Tax, Investment, PortfolioSummary, AssetAllocation } from '@/types';
 import { subMonths, format, subDays } from 'date-fns';
 
 const today = new Date();
@@ -28,9 +28,19 @@ export const invoices: Invoice[] = [
   { id: 'INV-005', customer: 'Global Exports', amount: 5500, status: 'overdue', issueDate: format(subDays(today, 45), 'yyyy-MM-dd'), dueDate: format(subDays(today, 15), 'yyyy-MM-dd'), taxId: 'TAX-002', taxAmount: 1100 },
 ];
 
+export const investments: Investment[] = [
+    { id: 'INV-ASSET-001', name: 'Bitcoin', type: 'Cryptocurrency', quantity: 0.5, buyPrice: 40000, currentPrice: 65000 },
+    { id: 'INV-ASSET-002', name: 'Ethereum', type: 'Cryptocurrency', quantity: 10, buyPrice: 2500, currentPrice: 3500 },
+    { id: 'INV-ASSET-003', name: 'Apple Inc.', type: 'Stocks', quantity: 100, buyPrice: 150, currentPrice: 210 },
+    { id: 'INV-ASSET-004', name: 'S&P 500 ETF', type: 'ETF', quantity: 50, buyPrice: 400, currentPrice: 530 },
+    { id: 'INV-ASSET-005', name: 'Tokenized Bond', type: 'Tokenized Asset', quantity: 1000, buyPrice: 98, currentPrice: 102 },
+];
+
+
 export const getTransactions = (): Transaction[] => transactions;
 export const getInvoices = (): Invoice[] => invoices;
 export const getTaxes = (): Tax[] => taxes;
+export const getInvestments = (): Investment[] => investments;
 
 
 export const getFinancialSummary = (): FinancialSummary => {
@@ -56,6 +66,27 @@ export const getFinancialSummary = (): FinancialSummary => {
     transactionPatterns: 'Recurring subscriptions and variable client payments.'
   };
 };
+
+export const getPortfolioSummary = (): PortfolioSummary => {
+    const totalInvested = investments.reduce((sum, asset) => sum + (asset.quantity * asset.buyPrice), 0);
+    const totalValue = investments.reduce((sum, asset) => sum + (asset.quantity * asset.currentPrice), 0);
+    const totalProfitLoss = totalValue - totalInvested;
+    const totalProfitLossPercentage = totalInvested > 0 ? (totalProfitLoss / totalInvested) * 100 : 0;
+
+    return { totalValue, totalInvested, totalProfitLoss, totalProfitLossPercentage };
+}
+
+export const getAssetAllocation = (): AssetAllocation[] => {
+    const allocation: { [key: string]: number } = {};
+    investments.forEach(asset => {
+        if (!allocation[asset.type]) {
+            allocation[asset.type] = 0;
+        }
+        allocation[asset.type] += asset.quantity * asset.currentPrice;
+    });
+
+    return Object.entries(allocation).map(([name, value]) => ({ name, value }));
+}
 
 
 export const getMonthlyChartData = () => {

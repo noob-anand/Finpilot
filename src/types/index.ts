@@ -31,3 +31,24 @@ export type FinancialSummary = {
   unpaidInvoicesCount: number;
   transactionPatterns: string;
 };
+
+export type Investment = {
+  id: string;
+  name: string;
+  type: 'Cryptocurrency' | 'Stocks' | 'Tokenized Asset' | 'ETF';
+  quantity: number;
+  buyPrice: number;
+  currentPrice: number;
+};
+
+export type PortfolioSummary = {
+    totalValue: number;
+    totalInvested: number;
+    totalProfitLoss: number;
+    totalProfitLossPercentage: number;
+}
+
+export type AssetAllocation = {
+    name: string;
+    value: number;
+}
