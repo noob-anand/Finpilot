@@ -4,8 +4,6 @@
  * @fileOverview This file implements the Genkit flow for the AICopilotAnswersCashFlowQuestions story.
  *
  * - aiCopilotAnswersCashFlowQuestions - A function that handles the AI Copilot answering cash flow questions.
- * - AICopilotAnswersCashFlowQuestionsInput - The input type for the aiCopilotAnswersCashFlowQuestions function.
- * - AICopilotAnswersCashFlowQuestionsOutput - The return type for the aiCopilotAnswersCashFlowQuestions function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -15,10 +13,12 @@ import {
   AICopilotAnswersCashFlowQuestionsInputSchema,
   AICopilotAnswersCashFlowQuestionsOutputSchema,
   type AICopilotAnswersCashFlowQuestionsInput,
-  type AICopilotAnswersCashFlowQuestionsOutput
+  type AICopilotAnswersCashFlowQuestionsOutput,
 } from '@/ai/schemas';
 
-export async function aiCopilotAnswersCashFlowQuestions(input: AICopilotAnswersCashFlowQuestionsInput): Promise<AICopilotAnswersCashFlowQuestionsOutput> {
+export async function aiCopilotAnswersCashFlowQuestions(
+  input: AICopilotAnswersCashFlowQuestionsInput
+): Promise<AICopilotAnswersCashFlowQuestionsOutput> {
   return aiCopilotAnswersCashFlowQuestionsFlow(input);
 }
 
@@ -45,23 +45,24 @@ const aiCopilotAnswersCashFlowQuestionsFlow = ai.defineFlow(
     outputSchema: AICopilotAnswersCashFlowQuestionsOutputSchema,
   },
   async input => {
-    const expenseRatio = input.cashInflow > 0 ? input.cashOutflow / input.cashInflow : 0;
+    const expenseRatio =
+      input.cashInflow > 0 ? input.cashOutflow / input.cashInflow : 0;
     const delayedReceivablesRatio = 0; // Assuming no data for this yet
 
     const financialSummary = await summarizeFinancialData({
-        cashInflow: input.cashInflow,
-        cashOutflow: input.cashOutflow,
-        netCashFlow: input.netCashFlow,
-        unpaidInvoicesCount: input.unpaidInvoicesCount,
-        expenseRatio: expenseRatio,
-        delayedReceivablesRatio: delayedReceivablesRatio,
+      cashInflow: input.cashInflow,
+      cashOutflow: input.cashOutflow,
+      netCashFlow: input.netCashFlow,
+      unpaidInvoicesCount: input.unpaidInvoicesCount,
+      expenseRatio: expenseRatio,
+      delayedReceivablesRatio: delayedReceivablesRatio,
     });
-    
+
     const summaryText = `${financialSummary.summary}\n\n**Recommendations:**\n${financialSummary.recommendations}`;
 
     const {output} = await prompt({
-        question: input.question,
-        summary: summaryText,
+      question: input.question,
+      summary: summaryText,
     });
     return output!;
   }
