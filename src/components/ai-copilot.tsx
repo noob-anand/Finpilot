@@ -26,7 +26,8 @@ import {
 } from '@/components/ui/form';
 import { aiCopilotAnswersCashFlowQuestions } from '@/ai/flows/ai-copilot-answers-cash-flow-questions';
 import { aiCopilotSuggestsImprovements } from '@/ai/flows/ai-copilot-suggests-improvements';
-import { getFinancialSummary } from '@/lib/data';
+import { summarizeFinancialData } from '@/ai/flows/ai-summarize-financial-data';
+import { getFinancialSummary, getMonthlyChartData } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
@@ -80,25 +81,41 @@ export default function AiCopilot() {
 
     try {
       const financialData = getFinancialSummary();
-      let response;
-
+      const monthlyData = getMonthlyChartData();
+      let responseText = '';
+      
       if (promptText.toLowerCase().includes('improve')) {
-        response = await aiCopilotSuggestsImprovements(financialData);
+        const response = await aiCopilotSuggestsImprovements({
+            ...financialData,
+        });
+        responseText = response.suggestions;
+      } else if (promptText.toLowerCase().includes('summarize')) {
+        const delayedReceivablesRatio = 0.2; 
+        const expenseRatio = financialData.cashOutflow / (financialData.cashInflow || 1);
+        const response = await summarizeFinancialData({
+            ...financialData,
+            delayedReceivablesRatio,
+            expenseRatio,
+        });
+        responseText = `${response.summary}\n\n**Recommendations:**\n${response.recommendations}`;
       } else {
-        response = await aiCopilotAnswersCashFlowQuestions({
+        const response = await aiCopilotAnswersCashFlowQuestions({
           ...financialData,
           unpaidInvoiceCount: financialData.unpaidInvoicesCount,
           question: promptText,
+          netCashFlow: financialData.cashInflow - financialData.cashOutflow,
         });
+        responseText = response.answer;
       }
 
       const assistantMessage: Message = {
         id: `assistant-${Date.now()}`,
-        text: response.answer || response.suggestions,
+        text: responseText,
         role: 'assistant',
       };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
+      console.error("AI Copilot Error:", error);
       const errorMessage: Message = {
         id: `error-${Date.now()}`,
         text: 'Sorry, I encountered an error. Please try again.',
@@ -235,3 +252,5 @@ export default function AiCopilot() {
     </>
   );
 }
+
+    
