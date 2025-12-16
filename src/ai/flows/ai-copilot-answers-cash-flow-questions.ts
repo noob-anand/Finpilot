@@ -34,10 +34,7 @@ const aiCopilotAnswersCashFlowQuestionsFlow = ai.defineFlow(
     const delayedReceivablesRatio = 0.2; // Assuming 20% for demonstration
 
     const financialSummary = await summarizeFinancialData({
-      cashInflow: input.cashInflow,
-      cashOutflow: input.cashOutflow,
-      netCashFlow: input.netCashFlow,
-      unpaidInvoicesCount: input.unpaidInvoicesCount,
+      ...input,
       expenseRatio: expenseRatio,
       delayedReceivablesRatio: delayedReceivablesRatio,
     });
