@@ -34,9 +34,7 @@ Unpaid Invoices Count: {{unpaidInvoicesCount}}
 Expense Ratio: {{expenseRatio}}
 Delayed Receivables Ratio: {{delayedReceivablesRatio}}
 
-Summary:
-
-Recommendations:`,
+Provide a concise summary of the business's financial health, followed by a bulleted list of 2-3 actionable recommendations.`,
 });
 
 const summarizeFinancialDataFlow = ai.defineFlow(

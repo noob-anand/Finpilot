@@ -60,9 +60,13 @@ export const AICopilotAnswersCashFlowQuestionsInputSchema = z.object({
   unpaidInvoicesCount: z.number().describe('The number of unpaid invoices.'),
   transactionPatterns: z.string().describe('Description of transaction patterns.'),
 });
-export type AICopilotAnswersCashFlowQuestionsInput = z.infer<typeof AICopilotAnswersCashFlowQuestionsInputSchema>;
+export type AICopilotAnswersCashFlowQuestionsInput = z.infer<
+  typeof AICopilotAnswersCashFlowQuestionsInputSchema
+>;
 
 export const AICopilotAnswersCashFlowQuestionsOutputSchema = z.object({
   answer: z.string().describe('The AI Copilot answer to the user question.'),
 });
-export type AICopilotAnswersCashFlowQuestionsOutput = z.infer<typeof AICopilotAnswersCashFlowQuestionsOutputSchema>;
+export type AICopilotAnswersCashFlowQuestionsOutput = z.infer<
+  typeof AICopilotAnswersCashFlowQuestionsOutputSchema
+>;
