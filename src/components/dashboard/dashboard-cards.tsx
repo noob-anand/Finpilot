@@ -1,3 +1,5 @@
+'use client';
+
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -12,6 +14,7 @@ import {
 } from '@/components/ui/card';
 import { getFinancialSummary } from '@/lib/data';
 import { cn } from '@/lib/utils';
+import { PiggyBank } from 'lucide-react';
 
 export function DashboardCards() {
   const summary = getFinancialSummary();
@@ -43,9 +46,9 @@ export function DashboardCards() {
     {
       title: 'Net Taxes',
       amount: formatCurrency(summary.netTaxes),
-      icon: Landmark,
-      color: 'text-blue-800 dark:text-blue-200',
-      bgColor: 'bg-blue-100 dark:bg-blue-900/50',
+      icon: PiggyBank,
+      color: 'text-cyan-800 dark:text-cyan-200',
+      bgColor: 'bg-cyan-100 dark:bg-cyan-900/50',
     },
     {
       title: 'Unpaid Invoices',
@@ -59,13 +62,13 @@ export function DashboardCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {cardData.map((card) => (
-        <Card key={card.title} className={cn(card.bgColor)}>
+        <Card key={card.title}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className={cn("text-sm font-medium", card.color)}>{card.title}</CardTitle>
             <card.icon className={cn('h-5 w-5', card.color)} />
           </CardHeader>
-          <CardContent>
-            <div className={cn('text-2xl font-bold p-6', card.color)}>{card.amount}</div>
+          <CardContent className={cn('p-6 pt-0', card.bgColor)}>
+            <div className={cn('text-2xl font-bold', card.color)}>{card.amount}</div>
           </CardContent>
         </Card>
       ))}
