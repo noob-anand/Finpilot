@@ -1,6 +1,6 @@
 'use client';
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 import {
   Card,
   CardContent,
@@ -9,7 +9,12 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { getAssetAllocation } from '@/lib/data';
-import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
 
 const chartConfig = {
   Cryptocurrency: {
