@@ -15,6 +15,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import { cn } from '@/lib/utils';
 
 const chartConfig = {
   'Rent': {
@@ -55,6 +56,29 @@ export function CapitalAllocationChart() {
     return `${formattedValue} (${percentage}%)`;
   };
 
+  const CustomLegend = ({ payload }: any) => {
+    return (
+      <div className="flex justify-center gap-4 mt-4 flex-wrap">
+        {payload.map((entry: any, index: number) => {
+          const { dataKey, name, color, value: dataValue } = entry.payload;
+          const item = data.find(d => d.name === dataValue);
+          const percentage = total > 0 ? ((item!.value / total) * 100).toFixed(1) : 0;
+          
+          return (
+            <div key={`item-${index}`} className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: color }}></span>
+              <div className="flex flex-col text-xs">
+                <span className="font-medium text-muted-foreground">{dataValue}</span>
+                <span className="font-bold">{percentage}%</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+
   return (
     <Card>
       <CardHeader>
@@ -81,7 +105,7 @@ export function CapitalAllocationChart() {
                     <Cell key={`cell-${index}`} fill={chartConfig[entry.name as keyof typeof chartConfig]?.color} />
                     ))}
                 </Pie>
-                 <Legend />
+                 <Legend content={<CustomLegend />} />
                 </PieChart>
             </ResponsiveContainer>
         </ChartContainer>
