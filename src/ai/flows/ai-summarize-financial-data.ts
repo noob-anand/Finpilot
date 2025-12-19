@@ -12,8 +12,6 @@ import {
   type FinancialDataSummaryInput,
   type FinancialDataSummaryOutput,
 } from '@/ai/schemas';
-import { gemini15Flash } from '@genkit-ai/googleai';
-
 
 export async function summarizeFinancialData(
   input: FinancialDataSummaryInput
@@ -29,7 +27,7 @@ const summarizeFinancialDataFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await ai.generate({
-      model: gemini15Flash,
+      model: 'gemini-1.5-flash',
       output: {
         schema: FinancialDataSummaryOutputSchema,
       },

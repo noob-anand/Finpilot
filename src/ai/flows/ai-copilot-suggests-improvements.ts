@@ -14,7 +14,6 @@ import {
   type AiCopilotSuggestsImprovementsInput,
   type AiCopilotSuggestsImprovementsOutput,
 } from '@/ai/schemas';
-import { gemini15Flash } from '@genkit-ai/googleai';
 
 export async function aiCopilotSuggestsImprovements(
   input: AiCopilotSuggestsImprovementsInput
@@ -30,7 +29,7 @@ const aiCopilotSuggestsImprovementsFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await ai.generate({
-      model: gemini15Flash,
+      model: 'gemini-1.5-flash',
       output: {
         schema: AiCopilotSuggestsImprovementsOutputSchema,
       },
