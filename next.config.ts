@@ -37,12 +37,9 @@ if (process.env.NODE_ENV === 'development') {
   // This is necessary to prevent cross-origin errors.
   // For more details, see: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
   if (process.env.WEB_HOST) {
-    nextConfig.experimental = {
-      ...nextConfig.experimental,
-      allowedDevOrigins: [
-        `https://${process.env.WEB_HOST}`,
-      ],
-    };
+    nextConfig.allowedDevOrigins = [
+      `https://${process.env.WEB_HOST}`,
+    ];
   }
 }
 
