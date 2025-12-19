@@ -30,7 +30,7 @@ const aiCopilotSuggestsImprovementsFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await ai.generate({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-pro',
       output: {
         schema: AiCopilotSuggestsImprovementsOutputSchema,
       },
