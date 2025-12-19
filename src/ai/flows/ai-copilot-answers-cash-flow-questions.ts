@@ -32,7 +32,7 @@ const aiCopilotAnswersCashFlowQuestionsFlow = ai.defineFlow(
     const expenseRatio =
       input.cashInflow > 0 ? input.cashOutflow / input.cashInflow : 0;
     // This is a mock value for demonstration. In a real app, you'd calculate this.
-    const delayedReceivablesRatio = 0.2; 
+    const delayedReceivablesRatio = 0.2;
 
     const financialSummary = await summarizeFinancialData({
       ...input,
@@ -43,7 +43,7 @@ const aiCopilotAnswersCashFlowQuestionsFlow = ai.defineFlow(
     const summaryText = `${financialSummary.summary}\n\n**Recommendations:**\n${financialSummary.recommendations}`;
 
     const {output} = await ai.generate({
-      model: googleAI.model('gemini-1.0-pro'),
+      model: 'gemini-1.5-flash',
       output: {
         schema: AICopilotAnswersCashFlowQuestionsOutputSchema,
       },
