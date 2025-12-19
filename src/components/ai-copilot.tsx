@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Bot, Sparkles, Home, Send, Loader } from 'lucide-react';
+import { aiCopilotAnswersCashFlowQuestions } from '@/ai/flows/ai-copilot-answers-cash-flow-questions';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Sheet,
   SheetContent,
@@ -10,13 +11,12 @@ import {
   SheetFooter,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar } from '@/components/ui/avatar';
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
-import { qnaTree, rootQuestionIds, type QnaNode } from '@/lib/qna-data';
 import { Textarea } from '@/components/ui/textarea';
+import { getFinancialSummary } from '@/lib/data';
+import { cn } from '@/lib/utils';
+import { Bot, Send, Sparkles } from 'lucide-react';
+import Image from 'next/image';
+import { useState, useRef, useEffect } from 'react';
 
 type Message = {
   id: string;
@@ -24,14 +24,20 @@ type Message = {
   role: 'user' | 'assistant';
 };
 
+const initialQuestions = [
+    'Why is my cash flow negative?',
+    'What should I improve this month?',
+    'Summarize my financial health.',
+];
+
 export default function AiCopilot() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [currentQuestionIds, setCurrentQuestionIds] =
-    useState<string[]>(rootQuestionIds);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  
+  const financialSummary = getFinancialSummary();
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -42,92 +48,49 @@ export default function AiCopilot() {
     }
   }, [messages, isLoading]);
 
-  const streamResponse = (node: QnaNode) => {
-    const words = node.answerText.split(' ');
-    const assistantMessage: Message = {
-      id: `assistant-${Date.now()}`,
-      text: '',
-      role: 'assistant',
-    };
-    
-    setMessages((prev) => [...prev, assistantMessage]);
-
-    let wordIndex = 0;
-    const interval = setInterval(() => {
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === assistantMessage.id
-            ? { ...m, text: words.slice(0, wordIndex + 1).join(' ') }
-            : m
-        )
-      );
-      wordIndex++;
-      if (wordIndex >= words.length) {
-        clearInterval(interval);
-        setCurrentQuestionIds(node.followUpQuestionIds);
-        setIsLoading(false);
-      }
-    }, 100); // Adjust typing speed here
-  };
-
-
-  const handleQuestionSelect = (questionId: string) => {
-    const node: QnaNode = qnaTree[questionId];
-    if (!node || isLoading) return;
-
-    setInputValue(node.questionText);
+  const handleSend = async (questionText?: string) => {
+    const question = questionText || inputValue;
+    if (!question.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,
-      text: node.questionText,
+      text: question,
       role: 'user',
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     setInputValue('');
-    setCurrentQuestionIds([]);
+    
+    try {
+      const result = await aiCopilotAnswersCashFlowQuestions({
+        question: question,
+        ...financialSummary
+      });
 
-
-    setTimeout(() => {
-      streamResponse(node);
-    }, 1000 + Math.random() * 1000); // Simulate "thinking" time
-  };
-
-  const handleReset = () => {
-    setMessages([]);
-    setCurrentQuestionIds(rootQuestionIds);
-    setInputValue('');
+      const assistantMessage: Message = {
+        id: `assistant-${Date.now()}`,
+        text: result.answer,
+        role: 'assistant',
+      };
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Error fetching AI response:', error);
+      const errorMessage: Message = {
+        id: `assistant-${Date.now()}`,
+        text: "I'm sorry, I'm having trouble connecting to my brain right now. Please try again in a moment.",
+        role: 'assistant',
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  const handleSend = () => {
-    if (!inputValue.trim() || isLoading) return;
-
-    const matchedQuestionId = Object.keys(qnaTree).find(id => qnaTree[id].questionText.toLowerCase() === inputValue.toLowerCase().trim());
-    if (matchedQuestionId) {
-        handleQuestionSelect(matchedQuestionId);
-    } else {
-        const userMessage: Message = {
-            id: `user-${Date.now()}`,
-            text: inputValue,
-            role: 'user',
-        };
-        setMessages((prev) => [...prev, userMessage]);
-        setIsLoading(true);
-        setInputValue('');
-        setCurrentQuestionIds([]);
-
-        setTimeout(() => {
-            const fallbackNode: QnaNode = {
-                questionText: '',
-                answerText: "I'm sorry, I can only respond to the suggested questions. Please select one of the options to continue.",
-                followUpQuestionIds: rootQuestionIds,
-            };
-            streamResponse(fallbackNode);
-        }, 1000);
-    }
+  const handleInitialQuestion = (question: string) => {
+    setInputValue(question);
+    handleSend(question);
   }
-
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
@@ -157,7 +120,7 @@ export default function AiCopilot() {
                   </p>
                 </div>
               )}
-              {messages.map((message) => (
+              {messages.map(message => (
                 <div
                   key={message.id}
                   className={cn(
@@ -166,82 +129,88 @@ export default function AiCopilot() {
                   )}
                 >
                   {message.role === 'assistant' && (
-                    <Avatar className="w-8 h-8 border">
-                      <div className="w-8 h-8 flex items-center justify-center bg-primary rounded-full">
+                     <div className="w-8 h-8 flex items-center justify-center bg-primary rounded-full border">
                         <Bot className="h-5 w-5 text-primary-foreground" />
                       </div>
-                    </Avatar>
                   )}
                   <div
                     className={cn(
-                      'rounded-lg px-4 py-3 max-w-[80%] text-sm',
+                      'rounded-lg px-4 py-3 max-w-[80%] text-sm whitespace-pre-wrap',
                       message.role === 'user'
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-muted'
                     )}
                   >
-                    <p style={{ whiteSpace: 'pre-wrap' }}>{message.text}{message.role === 'assistant' && isLoading && message.id === messages[messages.length - 1]?.id ? '...' : ''}</p>
+                    {message.text}
                   </div>
                   {message.role === 'user' && (
-                    <Avatar className="w-8 h-8 border">
-                      <Image
+                    <Image
                         src="https://picsum.photos/seed/finpilot-user/100"
                         alt="User avatar"
                         width={32}
                         height={32}
+                        className="rounded-full border"
                         data-ai-hint="user avatar"
                       />
-                    </Avatar>
                   )}
                 </div>
               ))}
+               {isLoading && (
+                 <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 flex items-center justify-center bg-primary rounded-full border">
+                        <Bot className="h-5 w-5 text-primary-foreground" />
+                      </div>
+                    <div className="rounded-lg px-4 py-3 max-w-[80%] text-sm bg-muted">
+                        <div className="flex items-center gap-2">
+                            <span className="h-2 w-2 bg-foreground/50 rounded-full animate-pulse delay-0"></span>
+                            <span className="h-2 w-2 bg-foreground/50 rounded-full animate-pulse delay-150"></span>
+                            <span className="h-2 w-2 bg-foreground/50 rounded-full animate-pulse delay-300"></span>
+                        </div>
+                    </div>
+                </div>
+              )}
             </div>
           </ScrollArea>
           <SheetFooter className="mt-auto flex flex-col gap-4">
-            <div className="flex gap-2 flex-wrap justify-start">
-              {currentQuestionIds.map((id) => (
-                <Button
-                  key={id}
-                  variant="outline"
-                  size="sm"
-                  className="text-xs h-auto py-1.5"
-                  onClick={() => handleQuestionSelect(id)}
-                  disabled={isLoading}
-                >
-                  {qnaTree[id].questionText}
-                </Button>
-              ))}
-              {messages.length > 0 && currentQuestionIds.length > 0 && !isLoading && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs h-auto py-1.5"
-                  onClick={handleReset}
-                  disabled={isLoading}
-                >
-                  <Home className="mr-1 h-3 w-3" />
-                  Back to Start
-                </Button>
-              )}
-            </div>
+             {messages.length === 0 && (
+                 <div className="flex gap-2 flex-wrap justify-start">
+                    {initialQuestions.map((q) => (
+                        <Button
+                        key={q}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-auto py-1.5"
+                        onClick={() => handleInitialQuestion(q)}
+                        disabled={isLoading}
+                        >
+                        {q}
+                        </Button>
+                    ))}
+                 </div>
+             )}
             <div className="flex items-center gap-2">
-                 <Textarea 
-                    placeholder="Type your message..." 
-                    rows={1} 
-                    className="flex-1 resize-none"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSend();
-                        }
-                    }}
-                    disabled={isLoading}
-                />
-                 <Button onClick={handleSend} size="icon" className="shrink-0" disabled={isLoading}>
-                    <Send className="h-4 w-4" />
-                </Button>
+              <Textarea
+                placeholder="Type your message..."
+                rows={1}
+                className="flex-1 resize-none"
+                value={inputValue}
+                onChange={e => setInputValue(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                disabled={isLoading}
+              />
+              <Button
+                onClick={() => handleSend()}
+                size="icon"
+                className="shrink-0"
+                disabled={isLoading || !inputValue.trim()}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
             </div>
           </SheetFooter>
         </SheetContent>

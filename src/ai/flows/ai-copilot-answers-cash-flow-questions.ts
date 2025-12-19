@@ -31,12 +31,13 @@ const aiCopilotAnswersCashFlowQuestionsFlow = ai.defineFlow(
   async input => {
     const expenseRatio =
       input.cashInflow > 0 ? input.cashOutflow / input.cashInflow : 0;
-    const delayedReceivablesRatio = 0.2; // Assuming 20% for demonstration
+    // This is a mock value for demonstration. In a real app, you'd calculate this.
+    const delayedReceivablesRatio = 0.2; 
 
     const financialSummary = await summarizeFinancialData({
       ...input,
-      expenseRatio: expenseRatio,
-      delayedReceivablesRatio: delayedReceivablesRatio,
+      expenseRatio,
+      delayedReceivablesRatio,
     });
 
     const summaryText = `${financialSummary.summary}\n\n**Recommendations:**\n${financialSummary.recommendations}`;
