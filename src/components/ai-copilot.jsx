@@ -72,7 +72,7 @@ export default function AiCopilot() {
       console.error('Error fetching AI response:', error);
       const errorMessage = {
         id: `assistant-${Date.now()}`,
-        text: "I'm sorry, I'm having trouble connecting to my brain right now. Please try again in a moment.",
+        text: `I'm sorry, an error occurred. Please try again.\n\n**Details:**\n${error.message || 'An unknown error occurred.'}`,
         role: 'assistant',
       };
       setMessages(prev => [...prev, errorMessage]);
