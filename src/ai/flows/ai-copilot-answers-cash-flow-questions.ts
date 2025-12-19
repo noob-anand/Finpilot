@@ -14,6 +14,7 @@ import {
   type AICopilotAnswersCashFlowQuestionsOutput,
 } from '@/ai/schemas';
 import {summarizeFinancialData} from './ai-summarize-financial-data';
+import { gemini15Flash } from '@genkit-ai/googleai';
 
 export async function aiCopilotAnswersCashFlowQuestions(
   input: AICopilotAnswersCashFlowQuestionsInput
@@ -42,7 +43,7 @@ const aiCopilotAnswersCashFlowQuestionsFlow = ai.defineFlow(
     const summaryText = `${financialSummary.summary}\n\n**Recommendations:**\n${financialSummary.recommendations}`;
 
     const {output} = await ai.generate({
-      model: 'googleai/gemini-1.5-flash-latest',
+      model: gemini15Flash,
       output: {
         schema: AICopilotAnswersCashFlowQuestionsOutputSchema,
       },
