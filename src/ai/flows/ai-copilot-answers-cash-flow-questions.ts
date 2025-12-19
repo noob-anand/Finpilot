@@ -42,7 +42,7 @@ const aiCopilotAnswersCashFlowQuestionsFlow = ai.defineFlow(
     const summaryText = `${financialSummary.summary}\n\n**Recommendations:**\n${financialSummary.recommendations}`;
 
     const {output} = await ai.generate({
-      model: 'gemini-1.5-flash',
+      model: 'googleai/gemini-1.5-flash-latest',
       output: {
         schema: AICopilotAnswersCashFlowQuestionsOutputSchema,
       },

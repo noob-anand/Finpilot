@@ -13,6 +13,7 @@ import {
   type FinancialDataSummaryOutput,
 } from '@/ai/schemas';
 
+
 export async function summarizeFinancialData(
   input: FinancialDataSummaryInput
 ): Promise<FinancialDataSummaryOutput> {
@@ -27,7 +28,7 @@ const summarizeFinancialDataFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await ai.generate({
-      model: 'gemini-1.5-flash',
+      model: 'googleai/gemini-1.5-flash-latest',
       output: {
         schema: FinancialDataSummaryOutputSchema,
       },
