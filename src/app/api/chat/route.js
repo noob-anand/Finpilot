@@ -1,3 +1,4 @@
+
 import { GoogleGenerativeAI } from '@google/genai';
 import { NextResponse } from 'next/server';
 
