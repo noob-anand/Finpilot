@@ -29,8 +29,6 @@ import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { getTaxes } from '@/lib/data';
-import { useState } from 'react';
 
 const formSchema = z.object({
   customer: z.string().min(2, 'Customer name is required.'),
@@ -41,8 +39,7 @@ const formSchema = z.object({
   taxId: z.string().optional(),
 });
 
-export function CreateInvoiceForm({ onInvoiceCreate }) {
-  const [taxes] = useState(getTaxes());
+export function CreateInvoiceForm({ onInvoiceCreate, taxes = [] }) {
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -53,7 +50,7 @@ export function CreateInvoiceForm({ onInvoiceCreate }) {
 
   const onSubmit = (values) => {
     let taxAmount = undefined;
-    if (values.taxId) {
+    if (values.taxId && values.taxId !== 'no-tax') {
       const selectedTax = taxes.find(t => t.id === values.taxId);
       if (selectedTax) {
         taxAmount = values.amount * selectedTax.rate;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PlusCircle } from 'lucide-react';
 import {
   Table,
@@ -30,14 +30,23 @@ import {
 } from '@/components/ui/sheet';
 import { CreateInvoiceForm } from './create-invoice-form';
 
-export function InvoicesTable() {
-  const [invoices, setInvoices] = useState(getInvoices());
+export function InvoicesTable({ dataSource = 'default' }) {
+  const [invoices, setInvoices] = useState([]);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const taxes = getTaxes();
+  const [taxes, setTaxes] = useState([]);
+
+  useEffect(() => {
+    setInvoices(getInvoices(dataSource));
+    setTaxes(getTaxes(dataSource));
+  }, [dataSource]);
 
   const handleAddInvoice = (newInvoice) => {
     const newId = `INV-${String(invoices.length + 1).padStart(3, '0')}`;
-    setInvoices((prev) => [{ id: newId, ...newInvoice }, ...prev]);
+    const updatedInvoices = [{ id: newId, ...newInvoice }, ...invoices];
+    setInvoices(updatedInvoices);
+    if (typeof window !== 'undefined' && dataSource === 'local') {
+      localStorage.setItem('personal_invoices', JSON.stringify(updatedInvoices));
+    }
     setIsSheetOpen(false);
   };
   
@@ -73,7 +82,7 @@ export function InvoicesTable() {
               <SheetHeader>
                 <SheetTitle>Create New Invoice</SheetTitle>
               </SheetHeader>
-              <CreateInvoiceForm onInvoiceCreate={handleAddInvoice} />
+              <CreateInvoiceForm onInvoiceCreate={handleAddInvoice} taxes={taxes} />
             </SheetContent>
           </Sheet>
         </div>

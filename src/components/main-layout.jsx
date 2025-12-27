@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   DollarSign,
   Home,
@@ -38,6 +38,8 @@ import {
 
 export function MainLayout({ children }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const isPersonal = pathname.startsWith('/personal');
 
   const navItems = [
     { href: '/', label: 'Dashboard', icon: Home },
@@ -46,6 +48,19 @@ export function MainLayout({ children }) {
     { href: '/taxes', label: 'Taxes', icon: Landmark },
     { href: '/investments', label: 'Investments', icon: CandlestickChart },
   ];
+
+  const handleUseExample = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('finpilot_data_source');
+      router.push('/');
+    }
+  };
+
+  const getHref = (baseHref) => {
+    if (!isPersonal) return baseHref;
+    if (baseHref === '/') return '/personal';
+    return `/personal${baseHref}`;
+  };
 
   return (
     <SidebarProvider>
@@ -62,9 +77,9 @@ export function MainLayout({ children }) {
           <SidebarMenu>
             {navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <Link href={item.href}>
+                <Link href={getHref(item.href)}>
                   <SidebarMenuButton
-                    isActive={pathname === item.href}
+                    isActive={pathname === getHref(item.href)}
                     tooltip={{ children: item.label }}
                   >
                     <item.icon />
@@ -100,7 +115,7 @@ export function MainLayout({ children }) {
             <DropdownMenuContent className="w-56 mb-2 ml-2" side="top" align="start">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleUseExample}>
                 <Sparkles className="mr-2 h-4 w-4" />
                 <span>Use Example</span>
               </DropdownMenuItem>

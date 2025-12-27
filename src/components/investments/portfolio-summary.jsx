@@ -9,9 +9,20 @@ import {
 } from '@/components/ui/card';
 import { getPortfolioSummary } from '@/lib/data';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 
-export function PortfolioSummary() {
-  const summary = getPortfolioSummary();
+export function PortfolioSummary({ dataSource = 'default' }) {
+  const [summary, setSummary] = useState({
+    totalValue: 0,
+    totalInvested: 0,
+    totalProfitLoss: 0,
+    totalProfitLossPercentage: 0,
+  });
+
+  useEffect(() => {
+    setSummary(getPortfolioSummary(dataSource));
+  }, [dataSource]);
+
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {

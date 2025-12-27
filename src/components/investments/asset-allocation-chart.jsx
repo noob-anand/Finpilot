@@ -14,6 +14,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import { useState, useEffect } from 'react';
+
 
 const chartConfig = {
   Cryptocurrency: {
@@ -35,8 +37,12 @@ const chartConfig = {
 };
 
 
-export function AssetAllocationChart() {
-  const data = getAssetAllocation();
+export function AssetAllocationChart({ dataSource = 'default' }) {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    setData(getAssetAllocation(dataSource));
+  }, [dataSource]);
 
   return (
     <Card>

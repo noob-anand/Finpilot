@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PlusCircle } from 'lucide-react';
 import {
   Table,
@@ -28,14 +28,23 @@ import {
 } from '@/components/ui/sheet';
 import { CreateTaxForm } from './create-tax-form';
 
-export function TaxesTable() {
-  const [taxes, setTaxes] = useState(getTaxes());
-  const [invoices] = useState(getInvoices());
+export function TaxesTable({ dataSource = 'default' }) {
+  const [taxes, setTaxes] = useState([]);
+  const [invoices, setInvoices] = useState([]);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  useEffect(() => {
+    setTaxes(getTaxes(dataSource));
+    setInvoices(getInvoices(dataSource));
+  }, [dataSource]);
 
   const handleAddTax = (newTax) => {
     const newId = `TAX-${String(taxes.length + 1).padStart(3, '0')}`;
-    setTaxes((prev) => [{ id: newId, ...newTax }, ...prev]);
+    const updatedTaxes = [{ id: newId, ...newTax }, ...taxes];
+    setTaxes(updatedTaxes);
+    if (typeof window !== 'undefined' && dataSource === 'local') {
+      localStorage.setItem('personal_taxes', JSON.stringify(updatedTaxes));
+    }
     setIsSheetOpen(false);
   };
 

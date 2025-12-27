@@ -1,5 +1,5 @@
 'use client';
-
+import { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -17,8 +17,12 @@ import {
 } from '@/components/ui/card';
 import { getTransactions } from '@/lib/data';
 
-export function TransactionsTable() {
-  const transactions = getTransactions();
+export function TransactionsTable({ dataSource = 'default' }) {
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    setTransactions(getTransactions(dataSource));
+  }, [dataSource]);
   
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {

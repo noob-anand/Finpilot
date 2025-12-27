@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PlusCircle } from 'lucide-react';
 import {
   Table,
@@ -30,13 +30,22 @@ import {
 } from '@/components/ui/sheet';
 import { CreateInvestmentForm } from './create-investment-form';
 
-export function InvestmentsTable() {
-  const [investments, setInvestments] = useState(getInvestments());
+export function InvestmentsTable({ dataSource = 'default' }) {
+  const [investments, setInvestments] = useState([]);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  useEffect(() => {
+    setInvestments(getInvestments(dataSource));
+  }, [dataSource]);
 
   const handleAddInvestment = (newInvestment) => {
     const newId = `INV-ASSET-${String(investments.length + 1).padStart(3, '0')}`;
-    setInvestments((prev) => [{ id: newId, ...newInvestment }, ...prev]);
+    const updatedInvestments = [{ id: newId, ...newInvestment }, ...investments];
+    setInvestments(updatedInvestments);
+
+    if (typeof window !== 'undefined' && dataSource === 'local') {
+        localStorage.setItem('personal_investments', JSON.stringify(updatedInvestments));
+    }
     setIsSheetOpen(false);
   };
   
