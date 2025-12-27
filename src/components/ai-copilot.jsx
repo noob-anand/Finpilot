@@ -11,7 +11,6 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
-import { getFinancialSummary } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { Bot, Send, Sparkles } from 'lucide-react';
 import Image from 'next/image';
@@ -29,8 +28,6 @@ export default function AiCopilot() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const scrollAreaRef = useRef(null);
-
-  const financialSummary = getFinancialSummary();
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -63,7 +60,6 @@ export default function AiCopilot() {
         },
         body: JSON.stringify({
           question: question,
-          financialSummary: financialSummary,
         }),
       });
       
