@@ -40,15 +40,18 @@ const aiCopilotAnswersCashFlowQuestionsFlow = ai.defineFlow(
     const summaryText = `${financialSummary.summary}\n\n**Recommendations:**\n${financialSummary.recommendations}`;
 
     const {output} = await ai.generate({
-      model: 'gemini-1.5-flash',
+      model: 'googleai/gemini-1.5-pro',
       output: {
         schema: AICopilotAnswersCashFlowQuestionsOutputSchema,
       },
-      prompt: `You are a virtual financial advisor for small business owners. Use the provided financial summary to answer the user's question about their cash flow in plain English, providing actionable explanations and recommendations.
+      prompt: `You are a world-class financial analyst and AI Copilot for a small business owner. Your expertise spans financial planning, market analysis, investment strategies, and cash flow management. You provide clear, concise, and actionable advice based on the data provided.
 
-Question: ${input.question}
+Use the provided financial summary to answer the user's question about their business. Go beyond surface-level answers. Provide deep insights, identify potential risks, and suggest concrete opportunities for improvement.
 
-Financial Summary: ${summaryText}`,
+User's Question: ${input.question}
+
+Business Financial Summary:
+${summaryText}`,
     });
 
     return output;
