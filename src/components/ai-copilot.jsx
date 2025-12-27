@@ -22,6 +22,15 @@ const initialQuestions = [
   'Summarize my financial health.',
 ];
 
+const cannedAnswers = {
+  'Why is my cash flow negative?':
+    "Your cash flow for the last month appears negative primarily due to two factors:\n\n1.  **High Cash Outflow:** You had a significant one-time marketing campaign expense of $500 and your recurring rent of $1,200.\n2.  **Timing of Payments:** While you have unpaid invoices totaling over $7,000, the cash hasn't been collected yet. Focusing on collecting payment for overdue invoices from 'Global Exports' could quickly improve your cash position.",
+  'What should I improve this month?':
+    "Based on your recent activity, here are two areas to focus on this month:\n\n1.  **Invoice Collection:** You have one 'overdue' invoice and one large 'unpaid' invoice. Prioritizing the collection of these receivables will significantly boost your cash inflow.\n2.  **Expense Management:** Your cash outflow is higher than your inflow. Review your recurring expenses, like software subscriptions, to see if there are any opportunities for cost savings.",
+  'Summarize my financial health.':
+    "Here's a quick summary of your financial health:\n\n*   **Profitability:** Your net profit is currently positive, which is a good sign.\n*   **Liquidity:** Your immediate cash flow is negative, indicating a potential short-term liquidity challenge. This is mainly due to high expenses and delayed customer payments.\n*   **Action Item:** The most critical action is to follow up on your unpaid and overdue invoices to improve your cash reserves.",
+};
+
 export default function AiCopilot() {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
@@ -52,47 +61,24 @@ export default function AiCopilot() {
     setIsLoading(true);
     setInputValue('');
 
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          question: question,
-        }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch AI response');
-      }
+    // Simulate thinking delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const result = await response.json();
+    const answer =
+      cannedAnswers[question] ||
+      "I'm sorry, I am only trained to answer the three initial questions. Please select one of them.";
 
-      const assistantMessage = {
-        id: `assistant-${Date.now()}`,
-        text: result.answer,
-        role: 'assistant',
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Error fetching AI response:', error);
-      const errorMessage = {
-        id: `assistant-${Date.now()}`,
-        text: `I'm sorry, an error occurred. Please try again.\n\n**Details:**\n${
-          error.message || 'An unknown error occurred.'
-        }`,
-        role: 'assistant',
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
+    const assistantMessage = {
+      id: `assistant-${Date.now()}`,
+      text: answer,
+      role: 'assistant',
+    };
+    setMessages((prev) => [...prev, assistantMessage]);
+    setIsLoading(false);
   };
 
   const handleInitialQuestion = (question) => {
-    setInputValue(question);
+    // No need to set input value, just send the question directly
     handleSend(question);
   };
 
