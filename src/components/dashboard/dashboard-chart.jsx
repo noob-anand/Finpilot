@@ -25,6 +25,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from '@/components/ui/chart';
+import { useState, useEffect } from 'react';
 
 const chartConfig = {
   inflow: {
@@ -43,8 +44,12 @@ const chartConfig = {
 
 const GAP_OFFSET = 5000;
 
-export function DashboardChart() {
-  const data = getMonthlyChartDataWithOffset(GAP_OFFSET);
+export function DashboardChart({ dataSource = 'default' }) {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    setData(getMonthlyChartDataWithOffset(GAP_OFFSET, dataSource));
+  }, [dataSource]);
 
   const customTooltipFormatter = (value, name) => {
     if (name === 'netProfit' && typeof value === 'number') {

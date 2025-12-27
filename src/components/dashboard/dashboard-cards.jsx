@@ -14,9 +14,19 @@ import {
 } from '@/components/ui/card';
 import { getFinancialSummary } from '@/lib/data';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 
-export function DashboardCards() {
-  const summary = getFinancialSummary();
+export function DashboardCards({ dataSource = 'default' }) {
+  const [summary, setSummary] = useState({
+      cashInflow: 0,
+      cashOutflow: 0,
+      netTaxes: 0,
+      unpaidInvoicesCount: 0
+  });
+
+  useEffect(() => {
+      setSummary(getFinancialSummary(dataSource));
+  }, [dataSource]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {

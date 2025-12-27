@@ -15,6 +15,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 
 const chartConfig = {
   'Rent': {
@@ -40,9 +41,13 @@ const chartConfig = {
 };
 
 
-export function CapitalAllocationChart() {
-  const data = getCapitalAllocation();
+export function CapitalAllocationChart({ dataSource = 'default' }) {
+  const [data, setData] = useState([]);
   const total = data.reduce((acc, curr) => acc + curr.value, 0);
+  
+  useEffect(() => {
+    setData(getCapitalAllocation(dataSource));
+  }, [dataSource]);
 
   const customTooltipFormatter = (value) => {
     const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
@@ -56,11 +61,12 @@ export function CapitalAllocationChart() {
   };
 
   const CustomLegend = ({ payload }) => {
+    const totalForLegend = payload.reduce((acc, curr) => acc + curr.payload.value, 0);
     return (
       <div className="flex justify-center gap-4 mt-4 flex-wrap">
         {payload.map((entry, index) => {
           const { name, value, color } = entry.payload;
-          const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+          const percentage = totalForLegend > 0 ? ((value / totalForLegend) * 100).toFixed(1) : 0;
           
           return (
             <div key={`item-${index}`} className="flex items-center gap-2">
@@ -86,27 +92,33 @@ export function CapitalAllocationChart() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-            <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                <ChartTooltip content={<ChartTooltipContent nameKey="name" formatter={customTooltipFormatter} />} />
-                <Pie
-                    data={data}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    strokeWidth={5}
-                >
-                    {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={chartConfig[entry.name]?.color} />
-                    ))}
-                </Pie>
-                 <Legend content={<CustomLegend />} />
-                </PieChart>
-            </ResponsiveContainer>
-        </ChartContainer>
+        {data.length === 0 ? (
+          <div className="flex items-center justify-center h-[250px]">
+            <p className="text-muted-foreground">No data to display.</p>
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+              <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                  <ChartTooltip content={<ChartTooltipContent nameKey="name" formatter={customTooltipFormatter} />} />
+                  <Pie
+                      data={data}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      strokeWidth={5}
+                  >
+                      {data.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={chartConfig[entry.name]?.color || '#8884d8'} />
+                      ))}
+                  </Pie>
+                  <Legend content={<CustomLegend />} />
+                  </PieChart>
+              </ResponsiveContainer>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   );

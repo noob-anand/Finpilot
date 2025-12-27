@@ -1,3 +1,4 @@
+'use client';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
@@ -26,12 +27,18 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
+import { useState, useEffect } from 'react';
 
 
-export function RecentActivity() {
-  const recentTransactions = getTransactions().slice(0, 3);
-  const recentInvoices = getInvoices().filter(i => i.status !== 'paid').slice(0, 3);
+export function RecentActivity({ dataSource = 'default' }) {
+  const [recentTransactions, setRecentTransactions] = useState([]);
+  const [recentInvoices, setRecentInvoices] = useState([]);
   
+  useEffect(() => {
+    setRecentTransactions(getTransactions(dataSource).slice(0, 3));
+    setRecentInvoices(getInvoices(dataSource).filter(i => i.status !== 'paid').slice(0, 3));
+  }, [dataSource]);
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -62,7 +69,7 @@ export function RecentActivity() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recentTransactions.map((transaction) => (
+                {recentTransactions.length > 0 ? recentTransactions.map((transaction) => (
                   <TableRow key={transaction.id}>
                     <TableCell>
                       <div className="font-medium">{transaction.description}</div>
@@ -74,7 +81,11 @@ export function RecentActivity() {
                       {transaction.type === 'inflow' ? '+' : '-'}{formatCurrency(transaction.amount)}
                     </TableCell>
                   </TableRow>
-                ))}
+                )) : (
+                    <TableRow>
+                        <TableCell colSpan={2} className="text-center text-muted-foreground">No recent transactions.</TableCell>
+                    </TableRow>
+                )}
               </TableBody>
             </Table>
              <div className="mt-4 text-center">
@@ -92,7 +103,7 @@ export function RecentActivity() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recentInvoices.map((invoice) => (
+                {recentInvoices.length > 0 ? recentInvoices.map((invoice) => (
                   <TableRow key={invoice.id}>
                     <TableCell>
                       <div className="font-medium">{invoice.customer}</div>
@@ -112,7 +123,11 @@ export function RecentActivity() {
                       {formatCurrency(invoice.amount)}
                     </TableCell>
                   </TableRow>
-                ))}
+                )) : (
+                    <TableRow>
+                        <TableCell colSpan={2} className="text-center text-muted-foreground">No pending invoices.</TableCell>
+                    </TableRow>
+                )}
               </TableBody>
             </Table>
             <div className="mt-4 text-center">

@@ -104,9 +104,11 @@ export function MainLayout({ children }) {
                 <Sparkles className="mr-2 h-4 w-4" />
                 <span>Use Example</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Create Your Profile</span>
+              <DropdownMenuItem asChild>
+                <Link href="/personal/data">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Create Your Profile</span>
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
