@@ -22,7 +22,14 @@ const initialQuestions = [
   'Summarize my financial health.',
 ];
 
-
+const cannedAnswers = {
+  'Why is my cash flow negative?':
+    "Your cash flow for the last month appears negative primarily due to two factors:\n\n1.  **High Cash Outflow:** You had a significant one-time marketing campaign expense of $500 and your recurring rent of $1,200.\n2.  **Timing of Payments:** While you have unpaid invoices totaling over $7,000, the cash hasn't been collected yet. Focusing on collecting payment for overdue invoices from 'Global Exports' could quickly improve your cash position.",
+  'What should I improve this month?':
+    "Based on your recent activity, here are two areas to focus on this month:\n\n1.  **Invoice Collection:** You have one 'overdue' invoice and one large 'unpaid' invoice. Prioritizing the collection of these receivables will significantly boost your cash inflow.\n2.  **Expense Management:** Your cash outflow is higher than your inflow. Review your recurring expenses, like software subscriptions, to see if there are any opportunities for cost savings.",
+  'Summarize my financial health.':
+    "Here's a quick summary of your financial health:\n\n*   **Profitability:** Your net profit is currently positive, which is a good sign.\n*   **Liquidity:** Your immediate cash flow is negative, indicating a potential short-term liquidity challenge. This is mainly due to high expenses and delayed customer payments.\n*   **Action Item:** The most critical action is to follow up on your unpaid and overdue invoices to improve your cash reserves.",
+};
 
 export default function AiCopilot() {
   const [messages, setMessages] = useState([]);
@@ -54,34 +61,25 @@ export default function AiCopilot() {
     setIsLoading(true);
     setInputValue('');
 
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: question }),
-      });
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message: question }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      const assistantMessage = {
-        id: `assistant-${Date.now()}`,
-        text: data.reply || "Sorry, I couldn't get a response.",
-        role: 'assistant',
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error("Error communicating with AI:", error);
-      const errorMessage = {
-        id: `assistant-${Date.now()}`,
-        text: "I encountered an error connecting to the server.",
-        role: 'assistant',
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
+    const answer = data.reply || "Something went wrong.";
+
+    const assistantMessage = {
+      id: `assistant-${Date.now()}`,
+      text: answer,
+      role: 'assistant',
+    };
+    setMessages((prev) => [...prev, assistantMessage]);
+    setIsLoading(false);
   };
 
   const handleInitialQuestion = (question) => {
