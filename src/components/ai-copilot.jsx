@@ -61,25 +61,38 @@ export default function AiCopilot() {
     setIsLoading(true);
     setInputValue('');
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ message: question }),
-    });
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: question }),
+      });
 
-    const data = await res.json();
+      if (!res.ok) {
+        throw new Error(`API error: ${res.status}`);
+      }
 
-    const answer = data.reply || "Something went wrong.";
+      const data = await res.json();
+      const answer = data.reply || "Something went wrong.";
 
-    const assistantMessage = {
-      id: `assistant-${Date.now()}`,
-      text: answer,
-      role: 'assistant',
-    };
-    setMessages((prev) => [...prev, assistantMessage]);
-    setIsLoading(false);
+      const assistantMessage = {
+        id: `assistant-${Date.now()}`,
+        text: answer,
+        role: 'assistant',
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error(error);
+      setMessages((prev) => [...prev, {
+        id: `assistant-${Date.now()}`,
+        text: "Sorry, I couldn't reach the server. Please try again later.",
+        role: 'assistant',
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInitialQuestion = (question) => {
